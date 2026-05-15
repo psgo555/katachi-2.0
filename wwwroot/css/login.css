@@ -1,0 +1,531 @@
+﻿/*
+ * KATACHI — login.css
+ * 使用前請確認已引入 tokens.css
+ */
+
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: var(--color-black);
+    font-family: var(--font-sans);
+    font-weight: 300;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* ── 整體版面 ── */
+.auth-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    height: 100vh;
+}
+
+
+
+/* 左側漸層遮罩 */
+.auth-left::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient( 135deg, rgba(24,24,24,0.3) 0%, transparent 50%, rgba(24,24,24,0.6) 100% );
+}
+
+/* 左側品牌覆蓋 */
+.auth-brand {
+    position: absolute;
+    top: 48px;
+    left: 48px;
+    z-index: 2;
+}
+
+.auth-brand-logo {
+    font-family: var(--font-brand);
+    font-weight: 800;
+    font-size: 1.6rem;
+    letter-spacing: 6px;
+    color: #ffffff;
+    text-decoration: none;
+    display: block;
+    margin-bottom: 12px;
+}
+
+.auth-brand-sub {
+    font-family: var(--font-mincho);
+    font-weight: 200;
+    font-size: 0.65rem;
+    letter-spacing: 4px;
+    color: var(--color-bg);
+}
+
+/* 左側底部 slogan */
+.auth-slogan {
+    position: absolute;
+    bottom: 48px;
+    left: 48px;
+    z-index: 2;
+    max-width: 320px;
+}
+
+.auth-slogan-text {
+    writing-mode: vertical-rl; /* 直排 */
+    text-orientation: mixed;
+    font-family: var(--font-mincho);
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: rgba(255,255,255,0.55);
+    letter-spacing: 4px;
+}
+
+.auth-slogan-line {
+    width: 0.5px;
+    height: 40px; /* 直排改成高度 */
+    background: rgba(255,255,255,0.3);
+    margin-bottom: 20px;
+    display: block;
+}
+
+
+@keyframes sloganFadeUp {
+    0% {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+/* ══ 右側：表單 ══ */
+.auth-right {
+    width: 500px;
+    background: rgba(245, 242, 235, 0.15); /* 降到非常低的不透明度 */
+    backdrop-filter: blur(15px);
+    border: none; /* 拿掉邊框，用邊界模糊來區分 */
+    color: #E0DDD5; /* 文字改用米白色 */
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 48px 40px;
+    position: relative;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2); /* 增加陰影深度，讓它從背景中浮現 */
+    /* 設定預設文字顏色為深炭色 */
+    color: #2D2D2D;
+    animation: slideInFromRight 1.2s 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* 關閉按鈕 */
+.auth-close {
+    position: absolute;
+    top: 28px;
+    right: 48px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-mincho);
+    font-size: 0.58rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--color-bg);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+    .auth-close:hover {
+        color: #ffffff;
+    }
+
+.auth-close-x {
+    width: 18px;
+    height: 18px;
+    position: relative;
+}
+
+    .auth-close-x::before,
+    .auth-close-x::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        width: 100%;
+        height: 1.5px;
+        background: currentColor;
+        transform-origin: center;
+    }
+
+    .auth-close-x::before {
+        transform: rotate(45deg);
+    }
+
+    .auth-close-x::after {
+        transform: rotate(-45deg);
+    }
+
+/* 右側頂部裝飾文字 */
+.auth-deco-num {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    font-family: var(--font-brand);
+    font-weight: 800;
+    font-size: 0.7rem;
+    letter-spacing: 4px;
+    color: rgba(255,255,255,0.08);
+}
+
+/* ── Tab 切換 ── */
+.auth-tabs {
+    display: flex;
+    gap: 0;
+    .auth-right input margin-bottom: 48px;
+    border-bottom: 0.5px solid rgba(255,255,255,0.08);
+}
+
+.auth-tab {
+    background: transparent;
+    border: none;
+    padding: 10px 0;
+    margin-right: 36px;
+    font-family: var(--font-serif);
+    font-weight: 300;
+    font-size: 0.78rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.25);
+    cursor: pointer;
+    border-bottom: 1.5px solid transparent;
+    margin-bottom: -1px;
+    transition: color 0.25s, border-color 0.25s;
+}
+
+    .auth-tab.active {
+        color: var(--color-white);
+        border-bottom-color: rgba(180, 70, 50, 0.45);
+    }
+
+/* ── 表單面板 ── */
+.auth-panel {
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.35s cubic-bezier(0.16,1,0.3,1), transform 0.35s cubic-bezier(0.16,1,0.3,1);
+    pointer-events: none;
+    display: block;
+    position: absolute;
+    width: calc(100% - 144px);
+}
+
+    .auth-panel.show {
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: all;
+        position: relative;
+        width: 100%;
+    }
+
+/* 標題 */
+.auth-title {
+    padding-bottom: 32px;
+    font-family: var(--font-mincho);
+    font-weight: 800;
+    font-size: 2.6rem;
+    letter-spacing: 3px;
+    color: var(--color-bg);
+    line-height: 1;
+    margin-bottom: 8px;
+}
+
+.auth-subtitle {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 200;
+    font-size: 0.78rem;
+    letter-spacing: 3px;
+    color: rgba(255,255,255,0.25);
+    margin-bottom: 40px;
+}
+
+/* 輸入框 */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    font-family: var(--font-mincho);
+    display: block;
+    font-size: 0.8rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--color-bg-off);
+    margin-bottom: 8px;
+}
+
+.form-input {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: none;
+    border-radius: 5px;
+    border: 0.5px solid rgba(255,255,255,0.12);
+    color: #ffffff;
+    font-family: var(--font-sans);
+    font-weight: 300;
+    font-size: 0.9rem;
+    letter-spacing: 2px;
+    padding: 12px 0;
+    outline: none;
+    transition: border-color 0.25s;
+    -webkit-appearance: none;
+}
+
+    .form-input::placeholder {
+        color: rgba(255,255,255,0.15);
+    }
+
+    .form-input:focus {
+        border-bottom-color: #c17f5a;
+    }
+
+/* 輔助文字行 */
+.form-row-extra {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 6px;
+}
+
+.form-link {
+    font-size: 0.55rem;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,0.25);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+    .form-link:hover {
+        color: rgba(255,255,255,0.6);
+    }
+
+/* 主按鈕 */
+.btn-auth {
+    width: 100%;
+    margin-top: 32px;
+    padding: 16px;
+    background: transparent;
+    border: 0.5px solid rgba(255,255,255,0.3);
+    color: #ffffff;
+    font-family: var(--font-brand);
+    font-weight: 800;
+    font-size: 1rem;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s, color 0.3s;
+}
+
+    .btn-auth::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: #ffffff;
+        transform: translateX(-101%);
+        transition: transform 0.45s cubic-bezier(0.76,0,0.24,1);
+    }
+
+    .btn-auth:hover {
+        border-color: #ffffff;
+        color: var(--color-black, #181818);
+    }
+
+        .btn-auth:hover::before {
+            transform: translateX(0);
+        }
+
+    .btn-auth span {
+        position: relative;
+        z-index: 1;
+    }
+
+/* 分隔線 */
+.auth-divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 24px 0;
+}
+
+.auth-divider-line {
+    flex: 1;
+    height: 0.5px;
+    background: rgba(255,255,255,0.08);
+}
+
+.auth-divider-text {
+    font-size: 0.55rem;
+    letter-spacing: 3px;
+    color: rgba(255,255,255,0.2);
+}
+
+/* Google 按鈕 */
+.btn-google {
+    width: 100%;
+    padding: 13px;
+    background: transparent;
+    border: 0.5px solid rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.4);
+    font-family: var(--font-sans);
+    font-weight: 300;
+    font-size: 0.72rem;
+    letter-spacing: 3px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: border-color 0.2s, color 0.2s;
+}
+
+    .btn-google:hover {
+        border-color: rgba(255,255,255,0.3);
+        color: rgba(255,255,255,0.7);
+    }
+
+/* 底部切換文字 */
+.auth-switch {
+    margin-top: 32px;
+    font-size: 0.58rem;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,0.2);
+    text-align: center;
+}
+
+    .auth-switch button {
+        background: none;
+        border: none;
+        color: rgba(255,255,255,0.5);
+        cursor: pointer;
+        font-family: var(--font-sans);
+        font-size: 0.58rem;
+        letter-spacing: 2px;
+        text-decoration: underline;
+        padding: 0 4px;
+        transition: color 0.2s;
+    }
+
+        .auth-switch button:hover {
+            color: #ffffff;
+        }
+
+/* 條款文字 */
+.auth-terms {
+    margin-top: 16px;
+    font-size: 0.52rem;
+    letter-spacing: 1px;
+    color: rgba(255,255,255,0.15);
+    line-height: 1.8;
+    text-align: center;
+}
+
+    .auth-terms a {
+        color: rgba(255,255,255,0.3);
+        text-decoration: underline;
+    }
+
+
+/* 整體版面改成全螢幕背景+右側表單 */
+.auth-layout {
+    position: relative;
+    min-height: 100vh;
+    background-image: url('/images/login2.jpg');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding-right: 5%
+}
+
+/* 左側圖片區塊隱藏，改用背景圖 */
+.auth-left {
+    display: none;
+}
+
+
+
+@keyframes slideInFromRight {
+    0% {
+        transform: translateX(60px);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.auth-left-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 50%;
+    z-index: 1;
+    pointer-events: none;
+}
+
+    .auth-left-overlay .auth-brand {
+        position: absolute;
+        top: 48px;
+        left: 48px;
+    }
+
+    .auth-left-overlay .auth-slogan {
+        position: absolute;
+        bottom: 48px;
+        left: 48px;
+        opacity: 0;
+        animation: sloganFadeUp 0.8s 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+/* ── I → 啞鈴 SVG ── */
+.dumbbell-i {
+    display: inline-flex;
+    align-items: flex-end;
+}
+
+    .dumbbell-i svg {
+        height: 0.78em;
+        width: auto;
+    }
+
+
+/* 標題 (Sign In) */
+.auth-right h2,
+.auth-right .auth-title {
+    /*color: #1A1A1A;*/ /* 標題用最深色，增加重量感 */
+    font-weight: 500;
+    letter-spacing: 0.05em; /* 增加一點字距符合極簡美學 */
+}
+
+
+/* 輸入框內的文字顏色 */
+.auth-right input {
+    color: #333;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid #C0BAB1; /* 調整底線顏色 */
+}
+
+/* 底部按鈕 (登入) */
+.auth-right .btn-submit {
+    background-color: #333230; /* 深色按鈕與淺色容器形成對比 */
+    color: #F8F5F0; /* 按鈕文字反白用米色 */
+    border: none;
+    transition: all 0.3s ease;
+}
+
+    .auth-right .btn-submit:hover {
+        background-color: #55524E;
+    }
