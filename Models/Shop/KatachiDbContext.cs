@@ -106,7 +106,7 @@ namespace katachi.Models.Shop
             // Shop: Product -> Category
             modelBuilder.Entity<Product>()
                 .HasOne(p => p.Category)
-                .WithMany()
+                .WithMany(c => c.Products)
                 .HasForeignKey(p => p.CategoryId);
 
             // Shop: ProductOption -> Product
@@ -132,6 +132,7 @@ namespace katachi.Models.Shop
             modelBuilder.Entity<OrderItem>()
                 .HasOne(i => i.Order)
                 .WithMany(o => o.Items)
-                .HasForeignKey(i => i.OrderId);        }
+                .HasForeignKey(i => i.OrderId);
+        }
     }
 }
