@@ -1,4 +1,4 @@
-﻿:root {
+:root {
     --detail-muscle-fill: #f4d6c2;
     --detail-muscle-hover: #ffe08a;
     --detail-muscle-active: #ffb37a;
@@ -105,7 +105,8 @@ body {
     display: flex;
     align-items: center;
     height: 100vh;
-    transform: scale(0.9);
+    transform: translateY(-42px) scale(0.9);
+    transform-origin: center top;
 }
 
 .body-map__image {
