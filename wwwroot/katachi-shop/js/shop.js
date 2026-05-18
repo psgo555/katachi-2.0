@@ -187,7 +187,6 @@ const categoryMeta = {
 };
 
 let activeCategory = 'all';
-let backHomeIdleTimer = null;
 
 // 五、工具函式區
 function getNumericValue(card, key) {
@@ -218,23 +217,16 @@ function openProductDetail(productId) {
     window.location.href = `/Shop/ProductDetail?id=${encodeURIComponent(productId)}`;
 }
 
-// 只有在頁面已經往下捲時，才顯示右下角按鈕。
+// 修改這個函式：往下捲顯示，回到頂部隱藏
 function updateBackHomeButtonVisibility() {
-  if (!backHomeBtn) return;
-  if (window.scrollY <= 0) {
-    backHomeBtn.classList.remove('is-visible');
-  }
-}
+    if (!backHomeBtn) return;
 
-// 只要滑鼠滾動，就短暫顯示置頂按鈕。
-function handleBackHomeWheel() {
-  if (!backHomeBtn) return;
-
-  backHomeBtn.classList.add('is-visible');
-  clearTimeout(backHomeIdleTimer);
-  backHomeIdleTimer = setTimeout(() => {
-    backHomeBtn.classList.remove('is-visible');
-  }, 900);
+    // 當捲動超過 100px 時顯示按鈕，否則隱藏（數字 100 可自行調整）
+    if (window.scrollY > 100) {
+        backHomeBtn.classList.add('is-visible');
+    } else {
+        backHomeBtn.classList.remove('is-visible');
+    }
 }
 
 // 平滑捲動到商品列表區。
@@ -617,7 +609,6 @@ checkoutBtn.addEventListener('click', () => {
 if (backHomeBtn) {
   backHomeBtn.addEventListener('click', scrollToShopTop);
   window.addEventListener('scroll', updateBackHomeButtonVisibility, { passive: true });
-  window.addEventListener('wheel', handleBackHomeWheel, { passive: true });
   updateBackHomeButtonVisibility();
 }
 

@@ -1,4 +1,4 @@
-﻿// 細分肌群資料：右側面板顯示的訓練動作
+// 細分肌群資料：右側面板顯示的訓練動作
 const SUB_MUSCLE_DATA = {
   // 正面斜方肌
   frontTrapezius: {
@@ -495,7 +495,7 @@ function buildInteractiveSVG(muscleName, onRegionSelect) {
 
 // 右側動作列表
 // 在 modal 右側渲染細分肌群動作
-function renderDetailSubExercises(container, muscleName, regionKey, regionLabel) {
+function renderDetailSubExercises(container, muscleName, regionKey, regionLabel, equipmentFilter = []) {
   const muscleData = SUB_MUSCLE_DATA[muscleName]
   if (!muscleData) return
 
@@ -507,6 +507,11 @@ function renderDetailSubExercises(container, muscleName, regionKey, regionLabel)
   const wrapper = document.createElement('div')
   wrapper.className = 'detail-sub-exercises'
 
+  const activeEquipment = Array.isArray(equipmentFilter) ? equipmentFilter.filter(Boolean) : []
+  const filteredExercises = activeEquipment.length > 0
+    ? region.exercises.filter(ex => activeEquipment.includes(ex.equipment))
+    : region.exercises
+
   // 標題
   const title = document.createElement('h3')
   title.className = 'detail-sub-title'
@@ -517,13 +522,13 @@ function renderDetailSubExercises(container, muscleName, regionKey, regionLabel)
   const ul = document.createElement('ul')
   ul.className = 'detail-sub-list'
 
-  if (region.exercises.length === 0) {
+  if (filteredExercises.length === 0) {
     const li = document.createElement('li')
     li.className = 'detail-sub-item'
-    li.textContent = '尚未建立動作資料'
+    li.textContent = activeEquipment.length > 0 ? '此器材無對應動作' : '尚未建立動作資料'
     ul.appendChild(li)
   } else {
-    region.exercises.forEach(ex => {
+    filteredExercises.forEach(ex => {
       const li = document.createElement('li')
       li.className = 'detail-sub-item'
 

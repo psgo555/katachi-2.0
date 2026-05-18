@@ -14,14 +14,25 @@ body {
 
 html,
 body {
+    width: 100%;
+    overflow-x: hidden;
     background-color: var(--color-black);
     color: var(--color-bg);
     /* 文字也要改成白色才看得到 */
 }
 
+
+main {
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+}
 /* ── 整體版面 ── */
 .app-layout {
     --equipment-panel-width: var(--side-panel-width);
+    width: 100%;
+    max-width: 100vw;
+    box-sizing: border-box;
     display: flex;
     background-color: var(--color-bg);
     margin-top: 60px;
@@ -82,6 +93,8 @@ body {
 }
 
 
+
+
 /* ── 人體圖區塊 ── */
 .body-map {
     position: relative;
@@ -103,17 +116,17 @@ body {
 .body-map__figure {
     position: relative;
     display: flex;
+    flex: 0 0 auto;
     align-items: center;
     height: 100vh;
-    transform: translateY(-42px) scale(0.9);
-    transform-origin: center top;
+    transform: translateY(-12px) scale(0.9);
 }
 
 .body-map__image {
     display: block;
     width: auto;
-    height: 100vh;
-    max-width: 100%;
+    height: 100%;
+    max-width: none;
     filter: brightness(0) saturate(100%) invert(70%) sepia(18%) saturate(108%) hue-rotate(1deg) brightness(90%) contrast(92%);
 }
 
@@ -123,8 +136,15 @@ body {
     inset: 0;
     width: 100%;
     height: 100%;
+    pointer-events: auto;
     overflow: visible;
 }
+
+/*讓正反面按鈕切換在桌機版隱藏：*/
+.body-map-view-toggle {
+    display: none;
+}
+
 
 /* ── 肌肉互動樣式 ── */
 .muscle-pair {
@@ -212,8 +232,27 @@ body {
         opacity: 0.6;
     }
 
+.body-map__figure {
+    transition: opacity 0.18s ease, transform 0.18s ease;
+}
 
+.body-view.switching .body-map__figure {
+    opacity: 0.45;
+    transform: translateY(-12px) scale(0.87);
+}
 
+/* 桌機版接近斷點時，保留正反兩張圖，但跟著可用寬度縮小，避免擠到左右欄 */
+@media (max-width: 1600px) and (min-width: 1281px) {
+    .body-map {
+        gap: 12px;
+        padding-inline: 10px;
+    }
+
+    .body-map__figure {
+        height: clamp(500px, 40vw, 660px);
+        transform: translateY(-6px);
+    }
+}
 /* ── 右側器材面板 ── */
 .equipment-panel {
     width: var(--equipment-panel-width);
@@ -937,4 +976,189 @@ body {
     display: flex;
     flex-direction: column;
     margin-right: 80px;
+}
+
+/*在 1280px 以下才啟用響應式：上方工具列、左側人體圖、右側資訊面板*/
+@media (max-width: 1280px) {
+    .app-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(300px, 360px);
+        grid-template-rows: auto minmax(0, 1fr);
+        margin-top: 60px;
+        border-radius: 18px;
+        overflow: hidden;
+        min-height: calc(100svh - 60px);
+    }
+
+    .left-sidebar {
+        grid-column: 1 / -1;
+        width: auto;
+        margin: 0;
+        padding: 22px 32px;
+        display: grid;
+        grid-template-columns: minmax(220px, 1fr) auto;
+        align-items: center;
+        gap: 20px;
+        border-right: none;
+        border-bottom: 0.5px solid #d4d0ca;
+    }
+
+    .sidebar-title {
+        font-size: clamp(2.25rem, 6vw, 3.8rem);
+        margin-bottom: 10px;
+    }
+
+    .sidebar-tag,
+    .sidebar-divider,
+    .left-sidebar::before,
+    .left-sidebar::after,
+    .coord-label,
+    .sidebar-coordinates {
+        display: none;
+    }
+
+    .mode-switch {
+        width: auto;
+        margin-right: 0;
+        flex-direction: row;
+        justify-content: flex-end;
+        gap: 12px;
+    }
+
+    .mode-btn {
+        width: auto;
+        min-width: 132px;
+        white-space: nowrap;
+    }
+
+    .app-main {
+        grid-column: 1;
+        grid-row: 2;
+        min-width: 0;
+    }
+
+    .body-map {
+        min-height: calc(100svh - 154px);
+        height: 100%;
+        padding: 76px 20px 28px;
+        gap: 0;
+        overflow: hidden;
+    }
+
+    .body-map-view-toggle {
+        position: absolute;
+        top: 18px;
+        left: 50%;
+        z-index: 4;
+        display: inline-flex;
+        transform: translateX(-50%);
+        padding: 4px;
+        border: 1px solid var(--color-line);
+        border-radius: 999px;
+        background: rgba(245, 242, 235, 0.92);
+        box-shadow: 0 10px 24px rgba(24, 24, 24, 0.08);
+    }
+
+    .body-map-view-toggle__btn {
+        min-width: 64px;
+        height: 36px;
+        padding: 0 16px;
+        border: 0;
+        border-radius: 999px;
+        background: transparent;
+        color: var(--color-grey-mid);
+        font-family: var(--font-brand);
+        font-size: 0.95rem;
+        font-weight: var(--weight-bold);
+        letter-spacing: 1px;
+        cursor: pointer;
+    }
+
+        .body-map-view-toggle__btn.is-active {
+            background: var(--color-black);
+            color: var(--color-bg);
+        }
+
+    /* 響應式版只顯示一張人體圖*/
+    .body-map[data-mobile-view="front"] .body-map__figure--back,
+    .body-map[data-mobile-view="back"] .body-map__figure--front {
+        display: none;
+    }
+
+    .body-map__figure {
+        height: min(68svh, 660px);
+        transform: none;
+    }
+
+    .body-map__image {
+        height: 100%;
+        max-height: 68svh;
+    }
+
+    .equipment-panel {
+        grid-column: 2;
+        grid-row: 2;
+        width: auto;
+        flex: none;
+        margin: 0;
+        padding: 32px 28px;
+        justify-content: center;
+        border-left: 0.5px solid #d4d0ca;
+        border-top: none;
+        max-height: calc(100svh - 154px);
+    }
+}
+
+@media (max-width: 760px) {
+    .app-layout {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        max-width: 100vw;
+        min-height: auto;
+        border-radius: 0;
+    }
+
+    .left-sidebar {
+        display: block;
+        padding: 28px 24px 18px;
+    }
+
+    .sidebar-title {
+        font-size: clamp(2.6rem, 13vw, 4rem);
+    }
+
+    .mode-switch {
+        width: 100%;
+        justify-content: flex-start;
+        gap: 6px;
+        overflow-x: visible;
+    }
+
+    .mode-btn {
+        flex: 1 1 0;
+        min-width: 0;
+    }
+
+    .body-map {
+        width: 100%;
+        min-height: 74svh;
+        padding: 68px 12px 22px;
+    }
+
+    .body-map__figure {
+        height: 62svh;
+    }
+
+    .body-map__image {
+        max-height: 62svh;
+    }
+
+    .equipment-panel {
+        width: 100%;
+        max-height: none;
+        padding: 24px;
+        border-left: none;
+        border-top: 0.5px solid #d4d0ca;
+    }
 }

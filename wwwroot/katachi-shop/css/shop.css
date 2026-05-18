@@ -1080,35 +1080,32 @@
       line-height: 1.8;
     }
 
-    .back-home-btn {
-      position: fixed;
-      right: var(--space-24);
-      bottom: var(--space-24);
-      z-index: calc(var(--z-nav) + 2);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 40px;
-      height: 40px;
-      padding: 0;
-      border-radius: 8px;
-      border: 1px solid var(--color-black);
-      background: var(--color-accent);
-      color: var(--color-black);
-      font-size: 1.15rem;
-      font-weight: 700;
-      cursor: pointer;
-      box-shadow: 0 10px 24px rgba(24, 24, 24, 0.18);
-      opacity: 0;
-      pointer-events: none;
-      visibility: hidden;
-      transition:
-        background var(--dur-instant) var(--ease-out),
-        border-color var(--dur-instant) var(--ease-out),
-        transform var(--dur-instant) var(--ease-out),
-        opacity var(--dur-instant) var(--ease-out),
-        visibility var(--dur-instant) var(--ease-out);
-    }
+.back-home-btn {
+    position: fixed;
+    right: var(--space-24);
+    bottom: var(--space-24);
+    z-index: calc(var(--z-nav) + 2);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border-radius: 8px;
+    border: 0px solid var(--color-black);
+    background: var(--color-accent);
+    color: var(--color-black);
+    font-size: 1.15rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 10px 24px rgba(24, 24, 24, 0.18);
+    /* --- 預設為隱藏狀態 --- */
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+    /* --- 加上漸變動畫，讓顯示/消失更滑順 --- */
+    transition: opacity 0.3s, visibility 0.3s,background var(--dur-instant) var(--ease-out), border-color var(--dur-instant) var(--ease-out), transform var(--dur-instant) var(--ease-out), opacity var(--dur-instant) var(--ease-out), visibility var(--dur-instant) var(--ease-out);
+}
 
     .back-home-btn svg {
       width: 20px;

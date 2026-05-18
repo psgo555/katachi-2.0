@@ -1,4 +1,4 @@
-﻿@{
+@{
     ViewBag.Title = "KATACHI首頁";
 }
 
@@ -51,7 +51,8 @@
     </div>
     <!-- 中:人體圖區 -->
     <div class="app-main">
-        <div class="body-map body-view">
+        @* 預設正面 *@
+        <div class="body-map body-view" data-mobile-view="front">
             <!-- svg發光效果 -->
             <svg style="position: absolute; width: 0; height: 0" aria-hidden="true">
                 <defs>
@@ -63,9 +64,14 @@
                 </defs>
             </svg>
 
+            <div class="body-map-view-toggle" aria-label="切換人體正反面">
+                <button type="button" class="body-map-view-toggle__btn is-active" data-body-view="front" aria-pressed="true">正面</button>
+                <button type="button" class="body-map-view-toggle__btn" data-body-view="back" aria-pressed="false">背面</button>
+            </div>
+
             <!-- 模式切換 -->
             <!-- 正面圖 -->
-            <div class="body-map__figure">
+            <div class="body-map__figure body-map__figure--front">
                 <img class="body-map__image" src="~/svg/front.svg" alt="front body map" />
                 <!-- 互動 SVG 覆蓋層 -->
                 <svg class="body-map__overlay" viewBox="0 0 340 649" xmlns="http://www.w3.org/2000/svg">
@@ -115,7 +121,7 @@
             </div>
 
             <!-- 背面圖 -->
-            <div class="body-map__figure">
+            <div class="body-map__figure body-map__figure--back">
                 <img class="body-map__image" src="~/svg/back.svg" alt="back body map" />
                 <svg class="body-map__overlay body-map__overlay--back" viewBox="0 0 340 649" xmlns="http://www.w3.org/2000/svg">
                     <!-- 背部斜方肌 -->

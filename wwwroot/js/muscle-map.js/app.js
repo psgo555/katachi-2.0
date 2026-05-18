@@ -1,20 +1,58 @@
-﻿// 1. 綁定模式切換按鈕
+// 1. 綁定模式切換按鈕
 const btnSimple = document.querySelector('[data-mode="basic"]')
 const btnDetailed = document.querySelector('[data-mode="detail"]')
 const bodyView = document.querySelector('.body-view')
+const appLayout = document.querySelector('.app-layout')
+const mobileViewButtons = document.querySelectorAll('[data-body-view]')
+
+// 響應式切換正反面按鈕
+mobileViewButtons.forEach(button => {
+  button.addEventListener('click', () => {
+    const view = button.dataset.bodyView
+    bodyView.dataset.mobileView = view
+
+    mobileViewButtons.forEach(item => {
+      const isActive = item === button
+      item.classList.toggle('is-active', isActive)
+      item.setAttribute('aria-pressed', isActive ? 'true' : 'false')
+    })
+  })
+})
 // 點擊肌群會彈窗
 const DETAIL_MODAL_DISABLED_MUSCLES = new Set([])
 // 外部詳細 SVG 快取：第一次 fetch 後暫存在記憶體，避免重複讀檔延遲
 const DETAIL_SVG_CACHE = new Map()
+let dbExercises = []
+let dbExercisesLoaded = false
+
+async function loadDbExercises() {
+  if (dbExercisesLoaded) return dbExercises
+
+  try {
+    const response = await fetch('/MuscleMap/ExerciseList', { cache: 'no-cache' })
+    if (!response.ok) throw new Error('Exercise list request failed')
+    dbExercises = await response.json()
+  } catch (error) {
+    console.error(error)
+    dbExercises = []
+  } finally {
+    dbExercisesLoaded = true
+  }
+
+  return dbExercises
+}
+
+loadDbExercises().then(() => renderExercises())
 
 function switchMode(activate, deactivate) {
   bodyView.classList.add('switching')
   setTimeout(() => {
     activate.classList.add('active')
     deactivate.classList.remove('active')
+    if (appLayout) appLayout.classList.toggle('is-detail-mode', activate.dataset.mode === 'detail')
     resetAll()
     bodyView.classList.remove('switching')
-  }, 100)
+  }, 220)
 }
 
 // 1-1. 簡易按鈕
@@ -116,7 +154,11 @@ musclePairs.forEach(muscle => {
       }
 
       detailTitle.textContent = MUSCLE_LABELS[detailMuscleName] || MUSCLE_LABELS[muscleName]
-      if (detailModal) detailModal.dataset.muscleDetail = detailMuscleName
+      if (detailModal) {
+        detailModal.dataset.muscleDetail = detailMuscleName
+        delete detailModal.dataset.regionKey
+        delete detailModal.dataset.regionLabel
+      }
       detailBackdrop.style.display = 'flex'
 
       // 2-3-7. 清空彈窗內容
@@ -185,7 +227,12 @@ musclePairs.forEach(muscle => {
                   el.classList.remove('is-active', 'is-hovered')
                 })
                 regionEl.classList.add('is-active')
-                renderDetailSubExercises(detailLayout.actions, detailMuscleName, regionKey, regionLabel)
+                if (detailModal) {
+                  detailModal.dataset.muscleDetail = detailMuscleName
+                  detailModal.dataset.regionKey = regionKey
+                  detailModal.dataset.regionLabel = regionLabel
+                }
+                renderDetailSubExercises(detailLayout.actions, detailMuscleName, regionKey, regionLabel, selectedEquipment)
               }
 
               regionEl.addEventListener('click', selectRegion)
@@ -222,7 +269,12 @@ musclePairs.forEach(muscle => {
         } else {
           // 2-3-8a. 互動細分 SVG（有子區域可點擊）
           const interactiveSvg = buildInteractiveSVG(detailMuscleName, (regionKey, regionLabel) => {
-            renderDetailSubExercises(detailLayout.actions, detailMuscleName, regionKey, regionLabel)
+            if (detailModal) {
+              detailModal.dataset.muscleDetail = detailMuscleName
+              detailModal.dataset.regionKey = regionKey
+              detailModal.dataset.regionLabel = regionLabel
+            }
+            renderDetailSubExercises(detailLayout.actions, detailMuscleName, regionKey, regionLabel, selectedEquipment)
           })
           if (interactiveSvg) detailLayout.figure.appendChild(interactiveSvg)
         }
@@ -281,6 +333,8 @@ equipmentBtns.forEach(btn => {
 
     // 3-1-3. 重新渲染動作列表
     renderExercises()
+    loadDbExercises().then(() => renderExercises())
+    refreshOpenDetailExercises()
   })
 })
 
@@ -313,6 +367,19 @@ function createDetailEmpty(text) {
   return empty
 }
 
+function refreshOpenDetailExercises() {
+  if (!detailModal || detailBackdrop.style.display === 'none') return
+
+  const muscleName = detailModal.dataset.muscleDetail
+  const regionKey = detailModal.dataset.regionKey
+  const regionLabel = detailModal.dataset.regionLabel
+  const actions = detailModal.querySelector('.detail-actions')
+
+  if (!muscleName || !regionKey || !regionLabel || !actions) return
+
+  renderDetailSubExercises(actions, muscleName, regionKey, regionLabel, selectedEquipment)
+}
+
 
 // [主圖動作清單] 根據 selectedMuscle 與 selectedEquipment 渲染右側主清單
 function renderExercises() {
@@ -323,7 +390,20 @@ function renderExercises() {
   list.innerHTML = ''
   if (countEl) countEl.textContent = '—'
 
-  if (!selectedMuscle) return
+  if (!selectedMuscle) {
+    if (selectedEquipment.length === 0) return
+
+    const equipmentExercises = dbExercises.filter(ex => ex.name && ex.name.trim() && selectedEquipment.includes(ex.equipment))
+    if (equipmentExercises.length === 0) {
+      list.innerHTML = '<li class="exercise-empty">此器材無對應動作</li>'
+      if (countEl) countEl.textContent = '00'
+      return
+    }
+
+    if (countEl) countEl.textContent = equipmentExercises.length.toString().padStart(2, '0')
+    renderExerciseItems(list, equipmentExercises, selectedEquipment, false)
+    return
+  }
 
   const exercises = (EXERCISES[selectedMuscle] || []).filter(ex => ex.name && ex.name.trim())
   if (exercises.length === 0) {
@@ -348,16 +428,23 @@ function renderExercises() {
   // 通過所有判斷才更新數字
   if (countEl) countEl.textContent = filtered.length.toString().padStart(2, '0')
 
-  const isSimple = btnSimple.classList.contains('active')
   const groups = selectedEquipment.length > 0
     ? selectedEquipment
     : [...new Set(filtered.map(ex => ex.equipment))]
 
-  groups.forEach(eq => {
-    const groupExercises = filtered.filter(ex => ex.equipment === eq)
+  renderExerciseItems(list, filtered, groups, btnSimple.classList.contains('active'))
+}
+
+function renderExerciseItems(list, exercises, groups, useLinks) {
+  const visibleGroups = groups.length > 0
+    ? groups
+    : [...new Set(exercises.map(ex => ex.equipment))]
+
+  visibleGroups.forEach(eq => {
+    const groupExercises = exercises.filter(ex => ex.equipment === eq)
     if (groupExercises.length === 0) return
 
-    if (selectedEquipment.length > 1) {
+    if (visibleGroups.length > 1) {
       const header = document.createElement('li')
       header.className = 'exercise-group-header'
       header.textContent = EQUIPMENT_LABELS[eq] || eq
@@ -372,8 +459,9 @@ function renderExercises() {
         `<span class="${i < (ex.difficulty || 0) ? 'ex-list-star--filled' : 'ex-list-star--empty'}">★</span>`
       ).join('')
 
-      if (isSimple) {
-          const url = BASE_URL.exerciseDetail + `?muscle=${selectedMuscle}&equipment=${ex.equipment}&name=${encodeURIComponent(ex.name)}`
+      if (useLinks) {
+        const muscleKey = selectedMuscle || ex.muscle || ''
+        const url = BASE_URL.exerciseDetail + `?muscle=${muscleKey}&equipment=${ex.equipment}&name=${encodeURIComponent(ex.name)}`
         li.innerHTML = `
           <a class="exercise-name exercise-link" href="${url}">${ex.name}</a>
           <div class="ex-list-stars">${starsHtml}</div>

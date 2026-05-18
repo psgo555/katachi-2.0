@@ -53,7 +53,8 @@ const MUSCLE_LINK = {
 const EQUIPMENT_LABELS = {
   dumbbell: '啞鈴',
   barbell: '槓鈴',
-  bodyweight: '徒手訓練'
+  bodyweight: '徒手訓練',
+  machine: '機械式'
 }
 
 

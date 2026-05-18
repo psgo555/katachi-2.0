@@ -90,6 +90,57 @@ namespace katachi.Controllers
             });
         }
 
+        [HttpGet]
+        public async Task<IActionResult> ExerciseList()
+        {
+            var exercises = await _db.Exercises
+                .AsNoTracking()
+                .AsSplitQuery()
+                .Include(exercise => exercise.ExerciseEquipment)
+                    .ThenInclude(exerciseEquipment => exerciseEquipment.Equipment)
+                .Include(exercise => exercise.Goals)
+                .Include(exercise => exercise.ExerciseGroupPcts)
+                .ToListAsync();
+
+            var data = exercises
+                .Select(exercise =>
+                {
+                    var firstGoal = exercise.Goals
+                        .OrderBy(goal => goal.Id)
+                        .FirstOrDefault();
+
+                    var equipmentName = exercise.ExerciseEquipment?.Equipment?.Name ?? "";
+                    var muscles = exercise.ExerciseGroupPcts
+                        .OrderByDescending(groupPct => groupPct.Pct)
+                        .Select(groupPct => new
+                        {
+                            key = groupPct.GroupKey,
+                            name = GetMuscleLabel(groupPct.GroupKey),
+                            pct = groupPct.Pct
+                        })
+                        .ToList();
+
+                    return new
+                    {
+                        key = exercise.ExKey,
+                        name = exercise.NameZh,
+                        muscle = muscles.FirstOrDefault()?.key ?? "",
+                        muscleLabel = muscles.FirstOrDefault()?.name ?? "",
+                        equipment = ToEquipmentKey(equipmentName),
+                        equipmentLabel = equipmentName,
+                        difficulty = GetDifficulty(firstGoal?.Sets ?? 0),
+                        muscles,
+                        desc = BuildDescription(exercise.NameZh, equipmentName, firstGoal?.Sets, firstGoal?.Reps, firstGoal?.RestSeconds, muscles.Select(muscle => muscle.name)),
+                        sets = firstGoal?.Sets,
+                        reps = firstGoal?.Reps,
+                        restSeconds = firstGoal?.RestSeconds,
+                        img = GetExerciseImageUrl(exercise.ExKey, exercise.NameZh)
+                    };
+                })
+                .ToList();
+
+            return Json(data);
+        }
         private static string ToEquipmentKey(string equipmentName)
         {
             return equipmentName switch
@@ -97,6 +148,7 @@ namespace katachi.Controllers
                 "啞鈴" => "dumbbell",
                 "槓鈴" => "barbell",
                 "徒手" or "徒手訓練" or "自體重量" => "bodyweight",
+                "機械式" or "機械" or "器械" => "machine",
                 _ => equipmentName
             };
         }
