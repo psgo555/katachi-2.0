@@ -1,17 +1,17 @@
-﻿using katachi.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using katachi.Models.Shop;
 using System.Security.Claims;
 
 namespace katachi.Controllers
 {
     public class ShopController : Controller
     {
-        private readonly ShopDbContext _context;
+        private readonly KatachiDbContext _context;
         private readonly katachi.Models.Shop.KatachiDbContext _katachiContext;
 
-        public ShopController(ShopDbContext context, katachi.Models.Shop.KatachiDbContext katachiContext)
+        public ShopController(KatachiDbContext context, katachi.Models.Shop.KatachiDbContext katachiContext)
         {
             _context = context;
             _katachiContext = katachiContext;

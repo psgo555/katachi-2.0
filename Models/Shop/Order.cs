@@ -1,4 +1,6 @@
-﻿// 訂單主檔
+using System.ComponentModel.DataAnnotations.Schema;
+
+// 訂單主檔
 namespace katachi.Models.Shop
 {
     public class Order
@@ -8,6 +10,7 @@ namespace katachi.Models.Shop
         public string OrderNumber { get; set; } = string.Empty;
 
         // 會員登入後下單時，記錄這筆訂單屬於哪一位 users.user_id；未登入下單則為 null。
+        [Column("user_id")]
         public int? UserId { get; set; }
 
         public string RecipientName { get; set; } = string.Empty;

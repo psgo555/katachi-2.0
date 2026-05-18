@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using katachi.Models.Entities;
 
 namespace katachi.Models.Shop
@@ -22,6 +22,12 @@ namespace katachi.Models.Shop
         public DbSet<User> Users { get; set; }
         public DbSet<Food> Foods { get; set; }
         public DbSet<NutritionRecord> NutritionRecords { get; set; }
+        public DbSet<Category> Categories { get; set; }
+        public DbSet<Product> Products { get; set; }
+        public DbSet<ProductOption> ProductOptions { get; set; }
+        public DbSet<ProductOptionValue> ProductOptionValues { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderItem> OrderItems { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -96,6 +102,36 @@ namespace katachi.Models.Shop
                 .HasOne(r => r.Food)
                 .WithMany(f => f.NutritionRecords)
                 .HasForeignKey(r => r.FoodId);
-        }
+
+            // Shop: Product -> Category
+            modelBuilder.Entity<Product>()
+                .HasOne(p => p.Category)
+                .WithMany()
+                .HasForeignKey(p => p.CategoryId);
+
+            // Shop: ProductOption -> Product
+            modelBuilder.Entity<ProductOption>()
+                .HasOne(o => o.Product)
+                .WithMany(p => p.Options)
+                .HasForeignKey(o => o.ProductId);
+
+            // Shop: ProductOptionValue -> ProductOption
+            modelBuilder.Entity<ProductOptionValue>()
+                .HasOne(v => v.ProductOption)
+                .WithMany(o => o.Values)
+                .HasForeignKey(v => v.ProductOptionId);
+
+            // Shop: Order -> User (FK: user_id)
+            modelBuilder.Entity<Order>()
+                .HasOne<katachi.Models.Entities.User>()
+                .WithMany()
+                .HasForeignKey(o => o.UserId)
+                .HasConstraintName("FK_Orders_Users");
+
+            // Shop: OrderItem -> Order
+            modelBuilder.Entity<OrderItem>()
+                .HasOne(i => i.Order)
+                .WithMany(o => o.Items)
+                .HasForeignKey(i => i.OrderId);        }
     }
 }

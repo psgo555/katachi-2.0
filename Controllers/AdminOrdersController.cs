@@ -1,14 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using katachi.Data;
+using katachi.Models.Shop;
 
 namespace katachi.Controllers
 {
     public class AdminOrdersController : Controller
     {
-        private readonly ShopDbContext _context;
+        private readonly KatachiDbContext _context;
 
-        public AdminOrdersController(ShopDbContext context)
+        public AdminOrdersController(KatachiDbContext context)
         {
             _context = context;
         }

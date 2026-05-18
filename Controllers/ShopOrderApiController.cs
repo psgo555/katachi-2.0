@@ -1,6 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using katachi.Data;
 using katachi.Models.Shop;
 using System.Security.Claims;
 
@@ -11,9 +10,9 @@ namespace katachi.Controllers
     [ApiController]
     public class ShopOrderApiController : ControllerBase
     {
-        private readonly ShopDbContext _context;
+        private readonly KatachiDbContext _context;
 
-        public ShopOrderApiController(ShopDbContext context)
+        public ShopOrderApiController(KatachiDbContext context)
         {
             _context = context;
         }

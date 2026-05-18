@@ -1,5 +1,4 @@
-﻿using katachi.Models.Nutrition;
-using katachi.Data;
+using katachi.Models.Nutrition;
 using katachi.Models.Program;
 using katachi.Models.Shop;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -14,12 +13,6 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<KatachiDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("KatachiDB")
-    )
-);
-// 加入電商 DbContext
-builder.Services.AddDbContext<ShopDbContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("ShopDB")
     )
 );
 builder.Services.AddSingleton<katachi.Helpers.DbHelper>();

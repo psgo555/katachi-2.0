@@ -1,17 +1,17 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using katachi.Data;
+using katachi.Models.Shop;
 
 namespace katachi.Controllers
 {
     public class AdminProductOptionsController : Controller
     {
         //準備使用資料庫
-        private readonly ShopDbContext _context;
+        private readonly KatachiDbContext _context;
         private readonly IWebHostEnvironment _environment;
 
         // 把資料庫物件丟進來
-        public AdminProductOptionsController(ShopDbContext context, IWebHostEnvironment environment)
+        public AdminProductOptionsController(KatachiDbContext context, IWebHostEnvironment environment)
         {
             _context = context;
             _environment = environment;

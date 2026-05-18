@@ -1,6 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using katachi.Data;
 using katachi.Models.Shop;
 
 namespace katachi.Controllers
@@ -8,10 +7,10 @@ namespace katachi.Controllers
     public class AdminProductsController : Controller
     {
         // 數據庫交互的上下文對象，允許我們查詢和保存數據
-        private readonly ShopDbContext _context;
+        private readonly KatachiDbContext _context;
         private readonly IWebHostEnvironment _environment;
 
-        public AdminProductsController(ShopDbContext context, IWebHostEnvironment environment)
+        public AdminProductsController(KatachiDbContext context, IWebHostEnvironment environment)
         {
             _context = context;
             _environment = environment;
