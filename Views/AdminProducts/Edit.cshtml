@@ -20,7 +20,7 @@
             <a class="admin-link" asp-action="Index">返回列表</a>
         </div>
 
-    <form class="admin-form" method="post" asp-action="Edit" enctype="multipart/form-data">
+    <form class="admin-form" method="post" asp-action="Edit">
 		@* 隱藏欄位傳遞商品ID，讓Controller知道要修改哪一筆資料 *@
         <input type="hidden" asp-for="Id" />
         <div asp-validation-summary="All" class="admin-alert"></div>
@@ -79,22 +79,6 @@
         </div>
 
         <div class="admin-field">
-            <label>圖片路徑</label>
-            <input asp-for="ImageUrl" />
-            @if (!string.IsNullOrWhiteSpace(Model.ImageUrl))
-            {
-                <img class="admin-preview" src="@Model.ImageUrl" alt="@Model.Name" />
-            }
-            <span class="admin-help">可保留原路徑、手動改路徑，或在下面上傳新圖片覆蓋。</span>
-        </div>
-
-        <div class="admin-field">
-            <label>上傳新圖片</label>
-            <input type="file" name="imageFile" accept=".jpg,.jpeg,.png,.webp,.gif" />
-            <span class="admin-help">上傳後會自動存到 /katachi-shop/img/uploads。</span>
-        </div>
-
-        <div class="admin-field">
             <label>
                 <input asp-for="IsActive" />
                 上架
@@ -109,4 +93,5 @@
     </main>
 </body>
 </html>
+
 

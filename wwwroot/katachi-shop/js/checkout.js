@@ -60,8 +60,9 @@ function syncCartWithProducts() {
       name: product.name || item.name,
       subtitle: item.subtitle || product.categoryLabel || '',
       price: isBaseProduct ? Number(product.price ?? item.price) : item.price,
-      image: product.image || item.image,
-      alt: product.name || item.alt || item.name
+      image: item.image || product.image,
+      alt: product.name || item.alt || item.name,
+      optionValueIds: Array.isArray(item.optionValueIds) ? item.optionValueIds : []
     };
   });
 
@@ -374,6 +375,7 @@ async function initCheckoutPage() {
 }
 
 initCheckoutPage();
+
 
 
 

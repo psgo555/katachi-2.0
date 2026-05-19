@@ -1,4 +1,4 @@
-@model List<katachi.Models.Shop.Order>
+﻿@model List<katachi.Models.Shop.Order>
 
 @{
     Layout = null;
@@ -267,7 +267,7 @@
                             @foreach (var item in order.Items)
                             {
                                 <div class="order-item">
-                                    <img src="@item.ImageUrl" alt="@item.ProductName">
+                                    <img src='@(item.OptionValues.Select(v => v.ProductOptionValue?.ImageUrl).FirstOrDefault(url => !string.IsNullOrWhiteSpace(url)) ?? "/katachi-shop/img/placeholder.png")' alt="@item.ProductName">
                                     <div>
                                         <div class="item-name">@item.ProductName × @item.Quantity</div>
                                         <div class="item-sub">@item.OptionText</div>
@@ -283,4 +283,5 @@
     </main>
 </body>
 </html>
+
 

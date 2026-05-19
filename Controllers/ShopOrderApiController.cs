@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using katachi.Models.Shop;
 using System.Security.Claims;
@@ -32,6 +32,8 @@ namespace katachi.Controllers
                 .ToList();
 
             var products = await _context.Products
+                .Include(product => product.Options)
+                    .ThenInclude(option => option.Values)
                 .Where(product => productCodes.Contains(product.ProductCode))
                 .ToDictionaryAsync(product => product.ProductCode);
 
@@ -67,18 +69,34 @@ namespace katachi.Controllers
                 MemberDiscount = request.MemberDiscount,
                 CouponDiscount = request.CouponDiscount,
                 Total = request.Total,
-                CreatedAt = DateTime.Now,
-                Items = request.Items.Select(item => new OrderItem
+                CreatedAt = DateTime.Now
+            };
+
+            foreach (var item in request.Items)
+            {
+                products.TryGetValue(item.Id, out var product);
+
+                var orderItem = new OrderItem
                 {
+                    ProductId = product?.Id,
                     ProductCode = item.Id,
                     ProductName = item.Name,
                     OptionText = item.Subtitle ?? string.Empty,
                     UnitPrice = item.Price,
                     Quantity = item.Qty,
-                    Subtotal = item.Price * item.Qty,
-                    ImageUrl = item.Image ?? string.Empty
-                }).ToList()
-            };
+                    Subtotal = item.Price * item.Qty
+                };
+
+                foreach (var valueId in ResolveSelectedOptionValueIds(item, product))
+                {
+                    orderItem.OptionValues.Add(new OrderItemOptionValue
+                    {
+                        ProductOptionValueId = valueId
+                    });
+                }
+
+                order.Items.Add(orderItem);
+            }
 
             _context.Orders.Add(order);
             await _context.SaveChangesAsync();
@@ -89,51 +107,91 @@ namespace katachi.Controllers
                 orderNumber = order.OrderNumber
             });
         }
+
+        private static IEnumerable<int> ResolveSelectedOptionValueIds(CreateOrderItemRequest item, Product? product)
+        {
+            if (item.OptionValueIds.Any())
+            {
+                return item.OptionValueIds.Distinct();
+            }
+
+            if (product == null)
+            {
+                return Enumerable.Empty<int>();
+            }
+
+            var selectedPairs = ParseOptionText(item.Subtitle);
+            var selectedIds = new List<int>();
+
+            foreach (var pair in selectedPairs)
+            {
+                var value = product.Options
+                    .FirstOrDefault(option => option.Name == pair.Key)?
+                    .Values
+                    .FirstOrDefault(value => value.Text == pair.Value);
+
+                if (value != null)
+                {
+                    selectedIds.Add(value.Id);
+                }
+            }
+
+            if (selectedIds.Count > 0)
+            {
+                return selectedIds;
+            }
+
+            var imageValue = product.Options
+                .SelectMany(option => option.Values)
+                .OrderBy(value => value.SortOrder)
+                .FirstOrDefault(value => !string.IsNullOrWhiteSpace(value.ImageUrl));
+
+            return imageValue == null ? Enumerable.Empty<int>() : new[] { imageValue.Id };
+        }
+
+        private static Dictionary<string, string> ParseOptionText(string? optionText)
+        {
+            if (string.IsNullOrWhiteSpace(optionText))
+            {
+                return new Dictionary<string, string>();
+            }
+
+            return optionText
+                .Split(" / ", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Select(part => part.Split('：', 2, StringSplitOptions.TrimEntries))
+                .Where(parts => parts.Length == 2 && !string.IsNullOrWhiteSpace(parts[0]) && !string.IsNullOrWhiteSpace(parts[1]))
+                .GroupBy(parts => parts[0])
+                .ToDictionary(group => group.Key, group => group.Last()[1]);
+        }
     }
 
     public class CreateOrderRequest
     {
         public List<CreateOrderItemRequest> Items { get; set; } = new();
-
         public CreateOrderRecipientRequest Recipient { get; set; } = new();
-
         public int Subtotal { get; set; }
-
         public int Shipping { get; set; }
-
         public int MemberDiscount { get; set; }
-
         public int CouponDiscount { get; set; }
-
         public int Total { get; set; }
     }
 
     public class CreateOrderItemRequest
     {
         public string Id { get; set; } = string.Empty;
-
         public string Name { get; set; } = string.Empty;
-
         public string Subtitle { get; set; } = string.Empty;
-
         public int Price { get; set; }
-
         public int Qty { get; set; }
-
         public string Image { get; set; } = string.Empty;
+        public List<int> OptionValueIds { get; set; } = new();
     }
 
     public class CreateOrderRecipientRequest
     {
         public string Name { get; set; } = string.Empty;
-
         public string Phone { get; set; } = string.Empty;
-
         public string Email { get; set; } = string.Empty;
-
         public string Address { get; set; } = string.Empty;
     }
 }
-
-
-

@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using katachi.Models.Shop;
 
@@ -19,10 +19,11 @@ namespace katachi.Controllers
         public async Task<IActionResult> GetProducts()
         {
             var products = await _context.Products
-     .Include(p => p.Category)
-     .Include(p => p.Options)
-         .ThenInclude(o => o.Values)
-                 .Where(p => p.IsActive)
+                .Include(p => p.Category)
+                .Include(p => p.Options)
+                    .ThenInclude(o => o.Values)
+                .Where(p => p.IsActive)
+                .OrderBy(p => p.Id)
                 .Select(p => new
                 {
                     id = p.ProductCode,
@@ -35,25 +36,29 @@ namespace katachi.Controllers
                     originalPrice = p.OriginalPrice,
                     stock = p.Stock,
                     rating = p.Rating,
-                    image = p.ImageUrl,
+                    image = p.Options
+                        .SelectMany(o => o.Values)
+                        .OrderBy(v => v.SortOrder)
+                        .Select(v => v.ImageUrl)
+                        .FirstOrDefault(url => url != null && url != ""),
                     options = p.Options
-    .OrderBy(o => o.SortOrder)
-    .Select(o => new
-    {
-        label = o.Name,
-        values = o.Values
-            .OrderBy(v => v.SortOrder)
-            .Select(v => new
-            {
-                text = v.Text,
-                price = v.Price,
-                originalPrice = v.OriginalPrice,
-                image = v.ImageUrl
-            })
-            .ToList()
-    })
-    .ToList()
-
+                        .OrderBy(o => o.SortOrder)
+                        .Select(o => new
+                        {
+                            label = o.Name,
+                            values = o.Values
+                                .OrderBy(v => v.SortOrder)
+                                .Select(v => new
+                                {
+                                    id = v.Id,
+                                    text = v.Text,
+                                    price = v.Price,
+                                    originalPrice = v.OriginalPrice,
+                                    image = v.ImageUrl
+                                })
+                                .ToList()
+                        })
+                        .ToList()
                 })
                 .ToListAsync();
 
@@ -61,4 +66,3 @@ namespace katachi.Controllers
         }
     }
 }
-

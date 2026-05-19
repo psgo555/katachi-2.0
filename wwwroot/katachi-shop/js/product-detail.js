@@ -1,4 +1,4 @@
-// 商品詳細頁的資料來源：從 product-data.js 讀進所有商品資料
+﻿// 商品詳細頁的資料來源：從 product-data.js 讀進所有商品資料
 let productSource = window.KATACHI_PRODUCTS || [];
 
 // 切換主圖，圖片切換轉場特效 => 淡入效果
@@ -56,6 +56,7 @@ let product = productSource.find((item) => item.id === productId) || productSour
 
 // 紀錄使用者目前已選的規格 / 口味 / 容量等選項
 const selectedOptions = {};
+const selectedOptionValueIds = {};
 
 // 商品數量與目前畫面顯示中的價格狀態
 // 1.預設數量為1
@@ -107,6 +108,12 @@ function getSelectedOptionsText() {
     .join(' / ');
 }
 
+function getSelectedOptionValueIds() {
+  return Object.values(selectedOptionValueIds)
+    .filter((id) => Number.isInteger(Number(id)))
+    .map((id) => Number(id));
+}
+
 function readCartState() {
   try {
     const raw = localStorage.getItem(CART_STORAGE_KEY);
@@ -142,6 +149,7 @@ function buildDetailCartItem() {
     price: currentPrice,
     image: detailImage.src,
     alt: detailImage.alt || product.name,
+    optionValueIds: getSelectedOptionValueIds(),
     qty: quantity
   };
 }
@@ -211,6 +219,7 @@ function createOptionGroup(option) {
     if (index === 0) {
       button.classList.add('is-active');
       selectedOptions[option.label] = getOptionText(value);
+      if (typeof value === 'object' && value.id) selectedOptionValueIds[option.label] = value.id;
       updatePriceByOption(option, value);
 
       // 如果選項有圖片（口味、顏色等），就同步把商品圖換成對應圖片。
@@ -226,6 +235,7 @@ function createOptionGroup(option) {
       values.querySelectorAll('.option-value').forEach((item) => item.classList.remove('is-active'));
       button.classList.add('is-active');
       selectedOptions[option.label] = getOptionText(value);
+      if (typeof value === 'object' && value.id) selectedOptionValueIds[option.label] = value.id;
       updatePriceByOption(option, value);
 
       // 如果選項有圖片（口味、顏色等），同步切換主圖並更新縮圖列 active。
@@ -365,6 +375,7 @@ function buildThumbs() {
         });
       });
       selectedOptions[flavorOption.label] = v.text;
+      if (v.id) selectedOptionValueIds[flavorOption.label] = v.id;
       renderSummary();
     });
 
@@ -558,3 +569,6 @@ async function initProductDetailPage() {
 }
 
 initProductDetailPage();
+
+
+

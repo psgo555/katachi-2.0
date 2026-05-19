@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using katachi.Models.Entities;
 
 namespace katachi.Models.Shop
@@ -28,6 +28,7 @@ namespace katachi.Models.Shop
         public DbSet<ProductOptionValue> ProductOptionValues { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
+        public DbSet<OrderItemOptionValue> OrderItemOptionValues { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -123,8 +124,8 @@ namespace katachi.Models.Shop
 
             // Shop: Order -> User (FK: user_id)
             modelBuilder.Entity<Order>()
-                .HasOne<katachi.Models.Entities.User>()
-                .WithMany()
+                .HasOne(o => o.User)
+                .WithMany(u => u.Orders)
                 .HasForeignKey(o => o.UserId)
                 .HasConstraintName("FK_Orders_Users");
 
@@ -133,6 +134,29 @@ namespace katachi.Models.Shop
                 .HasOne(i => i.Order)
                 .WithMany(o => o.Items)
                 .HasForeignKey(i => i.OrderId);
+
+            // Shop: OrderItem -> Product
+            modelBuilder.Entity<OrderItem>()
+                .HasOne(i => i.Product)
+                .WithMany()
+                .HasForeignKey(i => i.ProductId)
+                .HasConstraintName("FK_OrderItems_Products");
+
+            // Shop: OrderItemOptionValue -> OrderItem
+            modelBuilder.Entity<OrderItemOptionValue>()
+                .HasOne(v => v.OrderItem)
+                .WithMany(i => i.OptionValues)
+                .HasForeignKey(v => v.OrderItemId)
+                .HasConstraintName("FK_OrderItemOptionValues_OrderItems");
+
+            // Shop: OrderItemOptionValue -> ProductOptionValue
+            modelBuilder.Entity<OrderItemOptionValue>()
+                .HasOne(v => v.ProductOptionValue)
+                .WithMany()
+                .HasForeignKey(v => v.ProductOptionValueId)
+                .HasConstraintName("FK_OrderItemOptionValues_ProductOptionValues");
+
         }
     }
 }
+

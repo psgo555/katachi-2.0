@@ -21,7 +21,10 @@ namespace katachi.Data
 
         public DbSet<OrderItem> OrderItems { get; set; }
 
+        public DbSet<OrderItemOptionValue> OrderItemOptionValues { get; set; }
+
 
     }
 }
+
 

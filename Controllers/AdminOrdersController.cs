@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using katachi.Models.Shop;
 
@@ -28,6 +28,10 @@ namespace katachi.Controllers
         {
             var order = await _context.Orders
                 .Include(o => o.Items)
+                    .ThenInclude(i => i.Product)
+                .Include(o => o.Items)
+                    .ThenInclude(i => i.OptionValues)
+                        .ThenInclude(v => v.ProductOptionValue)
                 .FirstOrDefaultAsync(o => o.Id == id);
 
             if (order == null)
@@ -68,8 +72,9 @@ namespace katachi.Controllers
 
                 foreach (var item in order.Items)
                 {
-                    var product = await _context.Products
-                        .FirstOrDefaultAsync(p => p.ProductCode == item.ProductCode);
+                    var product = item.ProductId.HasValue
+                        ? await _context.Products.FirstOrDefaultAsync(p => p.Id == item.ProductId.Value)
+                        : await _context.Products.FirstOrDefaultAsync(p => p.ProductCode == item.ProductCode);
 
                     if (product != null)
                     {
@@ -87,8 +92,9 @@ namespace katachi.Controllers
 
                 foreach (var item in order.Items)
                 {
-                    var product = await _context.Products
-                        .FirstOrDefaultAsync(p => p.ProductCode == item.ProductCode);
+                    var product = item.ProductId.HasValue
+                        ? await _context.Products.FirstOrDefaultAsync(p => p.Id == item.ProductId.Value)
+                        : await _context.Products.FirstOrDefaultAsync(p => p.ProductCode == item.ProductCode);
 
                     if (product == null)
                     {
@@ -118,4 +124,5 @@ namespace katachi.Controllers
 
     }
 }
+
 

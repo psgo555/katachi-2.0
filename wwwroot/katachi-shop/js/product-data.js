@@ -1,4 +1,4 @@
-window.KATACHI_PRODUCTS = [
+﻿window.KATACHI_PRODUCTS = [
   // 產品：分離乳清蛋白
   {
     id: 'whey-isolate',
@@ -470,3 +470,5 @@ window.loadShopProductsFromApi = async function () {
 };
 
 renderShopProductsFromData();
+
+

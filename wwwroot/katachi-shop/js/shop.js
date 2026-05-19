@@ -1,4 +1,4 @@
-// 一、DOM 元素區
+﻿// 一、DOM 元素區
 const shopShell = document.querySelector('.shop-shell');
 // navbar滾動收合動態效果
 const topbar = document.querySelector('.topbar');
@@ -86,6 +86,7 @@ function buildCartItemFromProduct(productId, overrides = {}) {
     price: Number(overrides.price ?? product.price),
     image: overrides.image || product.image,
     alt: overrides.alt || product.alt,
+    optionValueIds: overrides.optionValueIds || product.optionValueIds || [],
     qty: Math.max(1, Number(overrides.qty) || 1)
   };
 }
@@ -128,6 +129,7 @@ function normalizeCartItem(item) {
     price: Number(item.price ?? product?.price ?? 0),
     image: item.image || product?.image || '',
     alt: item.alt || product?.alt || item.name || '',
+    optionValueIds: Array.isArray(item.optionValueIds) ? item.optionValueIds : [],
     qty: Math.max(1, Number(item.qty) || 1)
   };
 }
@@ -668,3 +670,6 @@ async function initShopPage() {
 }
 
 initShopPage();
+
+
+

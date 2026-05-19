@@ -421,6 +421,49 @@ function getExerciseMuscleKeys(exercise) {
   ].filter(Boolean)
 }
 
+function normalizeExerciseKey(value) {
+  return String(value || '').replace(/\s+/g, '').trim()
+}
+
+function getStaticExerciseItems() {
+  if (typeof EXERCISES === 'undefined' || !EXERCISES) return []
+
+  return Object.entries(EXERCISES).flatMap(([muscleKey, list]) =>
+    (list || [])
+      .filter(ex => ex.name && ex.name.trim())
+      .map(ex => ({
+        muscle: ex.muscle || muscleKey,
+        ...ex
+      }))
+  )
+}
+
+function getStaticExercisesForMuscle(muscleKey) {
+  if (typeof EXERCISES === 'undefined' || !EXERCISES) return []
+
+  return (EXERCISES[muscleKey] || [])
+    .filter(ex => ex.name && ex.name.trim())
+    .map(ex => ({
+      muscle: ex.muscle || muscleKey,
+      ...ex
+    }))
+}
+
+function mergeExerciseLists(primary = [], fallback = []) {
+  const merged = new Map()
+
+  ;[...primary, ...fallback].forEach(exercise => {
+    if (!exercise?.name || !exercise?.equipment) return
+
+    const key = `${normalizeExerciseKey(exercise.name)}|${exercise.equipment}`
+    if (!merged.has(key)) {
+      merged.set(key, exercise)
+    }
+  })
+
+  return Array.from(merged.values())
+}
+
 function exerciseMatchesSelectedMuscle(exercise, muscleKey) {
   const targetKeys = DB_MUSCLE_FILTERS[muscleKey] || [muscleKey]
   return getExerciseMuscleKeys(exercise).some(key => targetKeys.includes(key))
@@ -494,7 +537,8 @@ function renderExercises() {
   if (!selectedMuscle) {
     if (selectedEquipment.length === 0) return
 
-    const equipmentExercises = dbExercises.filter(ex => ex.name && ex.name.trim() && selectedEquipment.includes(ex.equipment))
+    const equipmentExercises = mergeExerciseLists(dbExercises, getStaticExerciseItems())
+      .filter(ex => ex.name && ex.name.trim() && selectedEquipment.includes(ex.equipment))
     if (equipmentExercises.length === 0) {
       list.innerHTML = '<li class="exercise-empty">此器材無對應動作</li>'
       if (countEl) countEl.textContent = '00'
@@ -509,8 +553,8 @@ function renderExercises() {
   const dbMuscleExercises = dbExercises
     .filter(ex => ex.name && ex.name.trim())
     .filter(ex => exerciseMatchesSelectedMuscle(ex, selectedMuscle))
-  const staticExercises = (EXERCISES[selectedMuscle] || []).filter(ex => ex.name && ex.name.trim())
-  const exercises = dbMuscleExercises.length > 0 ? dbMuscleExercises : staticExercises
+  const staticExercises = getStaticExercisesForMuscle(selectedMuscle)
+  const exercises = mergeExerciseLists(dbMuscleExercises, staticExercises)
 
   if (exercises.length === 0) {
     list.innerHTML = '<li class="exercise-empty">尚未建立動作資料</li>'

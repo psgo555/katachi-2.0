@@ -1,5 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using katachi.Models.Shop;
 
 namespace katachi.Models.Entities
 {
@@ -39,7 +40,9 @@ namespace katachi.Models.Entities
         public int? Tdee { get; set; }
 
         // 導航屬性
-        public ICollection<NutritionRecord> NutritionRecords { get; set; }
+        public ICollection<NutritionRecord> NutritionRecords { get; set; } = new List<NutritionRecord>();
+
+        public ICollection<Order> Orders { get; set; } = new List<Order>();
     }
 }
 

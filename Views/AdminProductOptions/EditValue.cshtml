@@ -14,53 +14,44 @@
 </head>
 <body class="admin-page">
     <main class="admin-shell">
-    <div class="admin-header">
-        <div>
-            <h1 class="admin-title">編輯商品選項值</h1>
-            <p>選項類型：@Model.ProductOption?.Name</p>
-        </div>
-        <a class="admin-link" asp-action="Index" asp-route-productId="@productId">返回選項列表</a>
-    </div>
-
-    <form class="admin-form" method="post" id="editValueForm" data-option-name="@Model.ProductOption?.Name" enctype="multipart/form-data">
-        <input type="hidden" name="productId" value="@productId" />
-        <input type="hidden" name="valueId" value="@Model.Id" />
-
-        <div class="admin-field">
-            <label>選項值</label>
-            <input type="text" name="text" value="@Model.Text" />
-        </div>
-
-        <div class="admin-field" id="priceRow">
-            <label>價格</label>
-            <input type="number" name="price" value="@Model.Price" />
-        </div>
-
-        <div class="admin-field" id="originalPriceRow">
-            <label>原價</label>
-            <input type="number" name="originalPrice" value="@Model.OriginalPrice" />
-        </div>
-
-        <div class="admin-field">
-            <label>圖片路徑</label>
-            <input type="text" name="imageUrl" value="@Model.ImageUrl" />
-            @if (!string.IsNullOrWhiteSpace(Model.ImageUrl))
-            {
-                <img class="admin-preview" src="@Model.ImageUrl" alt="@Model.Text" />
-            }
-            <span class="admin-help">可保留原路徑、手動改路徑，或在下面上傳新圖片覆蓋。</span>
-        </div>
-
-        <div class="admin-field">
-            <label>上傳新圖片</label>
-            <input type="file" name="imageFile" accept=".jpg,.jpeg,.png,.webp,.gif" />
-        </div>
-
-        <div class="admin-actions">
-            <button class="admin-btn primary" type="submit">儲存修改</button>
+        <div class="admin-header">
+            <div>
+                <h1 class="admin-title">編輯商品選項值</h1>
+                <p>選項類型：@Model.ProductOption?.Name</p>
+            </div>
             <a class="admin-link" asp-action="Index" asp-route-productId="@productId">返回選項列表</a>
         </div>
-    </form>
+
+        <form class="admin-form" method="post" id="editValueForm" data-option-name="@Model.ProductOption?.Name">
+            <input type="hidden" name="productId" value="@productId" />
+            <input type="hidden" name="valueId" value="@Model.Id" />
+
+            <div class="admin-field">
+                <label>選項值</label>
+                <input type="text" name="text" value="@Model.Text" />
+            </div>
+
+            <div class="admin-field" id="priceRow">
+                <label>價格</label>
+                <input type="number" name="price" value="@Model.Price" />
+            </div>
+
+            <div class="admin-field" id="originalPriceRow">
+                <label>原價</label>
+                <input type="number" name="originalPrice" value="@Model.OriginalPrice" />
+            </div>
+
+            <div class="admin-field">
+                <label>圖片路徑</label>
+                <input type="text" name="imageUrl" value="@Model.ImageUrl" />
+                <span class="admin-help">圖片只存放在選項值，例如口味或顏色對應的圖片。</span>
+            </div>
+
+            <div class="admin-actions">
+                <button class="admin-btn primary" type="submit">儲存修改</button>
+                <a class="admin-link" asp-action="Index" asp-route-productId="@productId">返回選項列表</a>
+            </div>
+        </form>
     </main>
 
     <script>
@@ -82,4 +73,3 @@
     </script>
 </body>
 </html>
-

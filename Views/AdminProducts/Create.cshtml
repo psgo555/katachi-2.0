@@ -22,7 +22,7 @@
             <a class="admin-link" asp-action="Index">返回列表</a>
         </div>
 
-        <form class="admin-form" method="post" asp-action="Create" enctype="multipart/form-data">
+        <form class="admin-form" method="post" asp-action="Create">
         <div asp-validation-summary="All" class="admin-alert"></div>
 
         <div class="admin-field">
@@ -76,18 +76,6 @@
         </div>
 
         <div class="admin-field">
-            <label>圖片路徑</label>
-            <input asp-for="ImageUrl" />
-            <span class="admin-help">可以手動輸入圖片路徑，或在下面直接上傳圖片。</span>
-        </div>
-
-        <div class="admin-field">
-            <label>上傳圖片</label>
-            <input type="file" name="imageFile" accept=".jpg,.jpeg,.png,.webp,.gif" />
-            <span class="admin-help">上傳後會自動存到 /katachi-shop/img/uploads。</span>
-        </div>
-
-        <div class="admin-field">
             <label>
                 <input asp-for="IsActive" />
                 上架
@@ -102,4 +90,5 @@
     </main>
 </body>
 </html>
+
 

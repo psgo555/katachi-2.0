@@ -136,7 +136,100 @@ const EXERCISES = {
   hamstring: [],
   calves: [],
 }
+// [前端備援動作] 資料庫沒有對應資料時，仍保證每個肌群 × 每種器材至少有一個動作可顯示與查看說明。
+const FALLBACK_EQUIPMENT_ORDER = ['dumbbell', 'barbell', 'machine', 'bodyweight']
 
+const MUSCLE_SUMMARY_GROUPS = {
+  chest: 'chest',
+  frontTrapezius: 'back',
+  backTrapezius: 'back',
+  frontDeltoidLeft: 'shoulder',
+  frontDeltoidRight: 'shoulder',
+  rearDelt: 'shoulder',
+  rearDeltLeft: 'shoulder',
+  rearDeltRight: 'shoulder',
+  rhomboid: 'back',
+  lats: 'back',
+  bicepsLeft: 'arms',
+  bicepsRight: 'arms',
+  triceps: 'arms',
+  frontForearm: 'arms',
+  backForearm: 'arms',
+  abs: 'core',
+  sideabs: 'core',
+  quads: 'legs',
+  shin: 'legs',
+  hamstring: 'legs',
+  calves: 'legs',
+  glute: 'glute'
+}
 
+const MUSCLE_EQUIPMENT_FALLBACKS = {
+  frontTrapezius: { dumbbell: '啞鈴聳肩', barbell: '槓鈴聳肩', machine: '史密斯聳肩', bodyweight: '肩胛上提控制' },
+  backTrapezius: { dumbbell: '啞鈴聳肩', barbell: '槓鈴聳肩', machine: '史密斯聳肩', bodyweight: '俯身肩胛後收' },
+  frontDeltoidLeft: { dumbbell: '啞鈴肩推', barbell: '槓鈴肩推', machine: '肩推機', bodyweight: '派克伏地挺身' },
+  frontDeltoidRight: { dumbbell: '啞鈴肩推', barbell: '槓鈴肩推', machine: '肩推機', bodyweight: '派克伏地挺身' },
+  rearDelt: { dumbbell: '啞鈴反向飛鳥', barbell: '槓鈴後三角划船', machine: '反向飛鳥機', bodyweight: '俯臥 Y 字抬手' },
+  rearDeltLeft: { dumbbell: '啞鈴反向飛鳥', barbell: '槓鈴後三角划船', machine: '反向飛鳥機', bodyweight: '俯臥 Y 字抬手' },
+  rearDeltRight: { dumbbell: '啞鈴反向飛鳥', barbell: '槓鈴後三角划船', machine: '反向飛鳥機', bodyweight: '俯臥 Y 字抬手' },
+  chest: { dumbbell: '啞鈴臥推', barbell: '槓鈴臥推', machine: '胸推機', bodyweight: '伏地挺身' },
+  bicepsLeft: { dumbbell: '啞鈴彎舉', barbell: '槓鈴彎舉', machine: '滑輪彎舉', bodyweight: '反手澳式划船' },
+  bicepsRight: { dumbbell: '啞鈴彎舉', barbell: '槓鈴彎舉', machine: '滑輪彎舉', bodyweight: '反手澳式划船' },
+  triceps: { dumbbell: '啞鈴過頭伸展', barbell: '窄握槓鈴臥推', machine: '滑輪下壓', bodyweight: '鑽石伏地挺身' },
+  frontForearm: { dumbbell: '啞鈴腕彎舉', barbell: '槓鈴腕彎舉', machine: '滑輪腕彎舉', bodyweight: '懸垂握力訓練' },
+  backForearm: { dumbbell: '啞鈴反向腕彎舉', barbell: '槓鈴反向腕彎舉', machine: '滑輪反向腕彎舉', bodyweight: '毛巾懸垂' },
+  abs: { dumbbell: '啞鈴負重捲腹', barbell: '槓鈴滾輪', machine: '腹部捲腹機', bodyweight: '棒式' },
+  sideabs: { dumbbell: '啞鈴側彎', barbell: '槓鈴地雷管旋轉', machine: '滑輪伐木式旋轉', bodyweight: '側棒式' },
+  quads: { dumbbell: '啞鈴高腳杯深蹲', barbell: '槓鈴深蹲', machine: '腿伸展機', bodyweight: '徒手深蹲' },
+  shin: { dumbbell: '啞鈴脛前肌抬腳', barbell: '槓片脛前肌抬腳', machine: '脛前肌訓練機', bodyweight: '靠牆抬腳尖' },
+  rhomboid: { dumbbell: '啞鈴俯身划船', barbell: '槓鈴划船', machine: '坐姿划船機', bodyweight: '肩胛伏地挺身' },
+  lats: { dumbbell: '啞鈴上拉', barbell: '槓鈴划船', machine: '滑輪下拉', bodyweight: '引體向上' },
+  glute: { dumbbell: '啞鈴臀推', barbell: '槓鈴臀推', machine: '臀部後踢機', bodyweight: '臀橋' },
+  hamstring: { dumbbell: '啞鈴羅馬尼亞硬舉', barbell: '槓鈴羅馬尼亞硬舉', machine: '腿後勾機', bodyweight: '滑步腿後勾' },
+  calves: { dumbbell: '啞鈴站姿提踵', barbell: '槓鈴站姿提踵', machine: '坐姿提踵機', bodyweight: '徒手提踵' }
+}
 
+function createFallbackExercise(muscleKey, equipment, name) {
+  const muscleLabel = MUSCLE_LABELS[muscleKey] || muscleKey
+  const cleanMuscleLabel = muscleLabel.replace(/（.*?）/g, '')
+  const equipmentLabel = EQUIPMENT_LABELS[equipment] || equipment
+  const summaryKey = MUSCLE_SUMMARY_GROUPS[muscleKey] || muscleKey
+  const difficultyMap = { dumbbell: 2, barbell: 3, machine: 2, bodyweight: 1 }
+  const repsMap = { dumbbell: '10-12', barbell: '8-10', machine: '10-15', bodyweight: '12-15' }
 
+  return {
+    name,
+    equipment,
+    equipmentLabel,
+    muscle: muscleKey,
+    muscleLabel: cleanMuscleLabel,
+    difficulty: difficultyMap[equipment] || 2,
+    muscles: [
+      { key: summaryKey, name: cleanMuscleLabel, pct: 70 },
+      { key: 'core', name: '核心穩定', pct: 15 }
+    ],
+    sets: 3,
+    reps: repsMap[equipment] || '10-12',
+    restSeconds: '45-60',
+    desc: `1.使用${equipmentLabel}進行${name}，先調整姿勢並對準${cleanMuscleLabel}發力。\n2.動作過程保持核心收緊，避免聳肩、甩動或用其他部位代償。\n3.以可控制的速度完成向心與離心階段，感受${cleanMuscleLabel}穩定收縮。\n4.每組保留穩定動作品質，若姿勢跑掉就降低重量或減少次數。`,
+    img: ''
+  }
+}
+
+function ensureFallbackExercises() {
+  Object.keys(MUSCLE_LABELS).forEach(muscleKey => {
+    if (!EXERCISES[muscleKey]) EXERCISES[muscleKey] = []
+
+    const fallbackSet = MUSCLE_EQUIPMENT_FALLBACKS[muscleKey]
+    if (!fallbackSet) return
+
+    FALLBACK_EQUIPMENT_ORDER.forEach(equipment => {
+      const exists = EXERCISES[muscleKey].some(ex => ex.equipment === equipment && ex.name)
+      if (exists) return
+
+      EXERCISES[muscleKey].push(createFallbackExercise(muscleKey, equipment, fallbackSet[equipment]))
+    })
+  })
+}
+
+ensureFallbackExercises()

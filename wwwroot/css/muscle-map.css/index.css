@@ -257,11 +257,11 @@ main {
 .equipment-panel {
     width: var(--equipment-panel-width);
     flex: 0 0 var(--equipment-panel-width);
-    padding: 48px 28px;
+    padding: 36px 28px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    gap: 24px;
+    justify-content: flex-start;
+    gap: 16px;
     background: var(--color-bg);
     border-left: 0.5px solid #d4d0ca;
     letter-spacing: 2px;
@@ -300,7 +300,7 @@ main {
     font-size: 1.6rem;
     letter-spacing: 2px;
     color: #181818;
-    margin-bottom: 4px;
+    margin-bottom: 0;
 }
 
 #muscle-name-en {
@@ -314,7 +314,7 @@ main {
 .equipment-panel hr {
     border: none;
     border-top: 0.5px solid #e6e3de;
-    margin: 20px 0;
+    margin: 10px 0 14px;
 }
 
 /* 小標題 */
@@ -446,9 +446,9 @@ main {
     list-style: none;
     padding: 2px 0 14px;
     font-family: var(--font-brand);
-    font-size: 0.75rem;
+    font-size: 0.78rem;
     letter-spacing: 2px;
-    color: #aaaaaa;
+    color: #7a756e;
     line-height: 1.7;
 }
 
@@ -471,13 +471,22 @@ main {
 
 .exercise-summary-item::after {
     content: '→';
-    color: #aaaaaa;
-    font-size: 0.8rem;
+    color: #6f6b64;
+    font-size: 0.9rem;
     margin-left: 12px;
+    transition: transform 0.18s ease, color 0.18s ease;
 }
 
-.exercise-summary-item:hover {
+.exercise-summary-item:hover,
+.exercise-summary-item:focus-visible {
     padding-left: 8px;
+    background: rgba(24, 24, 24, 0.045);
+}
+
+.exercise-summary-item:hover::after,
+.exercise-summary-item:focus-visible::after {
+    color: #181818;
+    transform: translateX(4px);
 }
 
 .exercise-summary-item strong {
@@ -512,6 +521,90 @@ main {
     display: none;
 }
 
+/* 右側面板可讀性與動作連結強化 */
+.equipment-panel #muscle-name-en,
+.equipment-panel .exercise-count-label,
+.equipment-panel .equipment-panel-label,
+.equipment-panel .exercise-empty,
+.equipment-panel .exercise-summary-intro {
+    color: #6f6b64;
+}
+
+.equipment-panel .exercise-group-header {
+    font-family: var(--font-brand);
+    font-size: 0.7rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #7a756e;
+    padding: 16px 0 8px;
+}
+
+.equipment-panel .exercise-item {
+    gap: 12px;
+    padding: 0;
+    border-bottom-color: #ddd8d0;
+    transition: background 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+}
+
+.equipment-panel .exercise-item::after {
+    color: #6f6b64;
+    font-size: 0.9rem;
+    padding-right: 2px;
+    transition: transform 0.18s ease, color 0.18s ease;
+}
+
+.equipment-panel .exercise-item:hover,
+.equipment-panel .exercise-item:focus-within {
+    background: rgba(24, 24, 24, 0.045);
+    border-color: #c9c2b8;
+    transform: translateX(4px);
+}
+
+.equipment-panel .exercise-item:hover::after,
+.equipment-panel .exercise-item:focus-within::after {
+    color: #181818;
+    transform: translateX(4px);
+}
+
+.equipment-panel .exercise-name {
+    width: 100%;
+    min-width: 0;
+    padding: 14px 0;
+    font-family: var(--font-brand);
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: 1.5px;
+    color: #181818;
+}
+
+.equipment-panel .exercise-link {
+    display: block;
+    color: #181818;
+    text-decoration: none;
+}
+
+.equipment-panel .exercise-link:focus-visible {
+    outline: 2px solid #181818;
+    outline-offset: 3px;
+    border-radius: 6px;
+}
+
+.equipment-panel .exercise-summary-item::after {
+    color: #6f6b64;
+    font-size: 0.9rem;
+    transition: transform 0.18s ease, color 0.18s ease;
+}
+
+.equipment-panel .exercise-summary-item:hover,
+.equipment-panel .exercise-summary-item:focus-visible {
+    background: rgba(24, 24, 24, 0.045);
+}
+
+.equipment-panel .exercise-summary-item:hover::after,
+.equipment-panel .exercise-summary-item:focus-visible::after {
+    color: #181818;
+    transform: translateX(4px);
+}
 /* ── 詳細按鈕彈窗 ── */
 .muscle-detail-backdrop {
     position: fixed;
@@ -1167,7 +1260,7 @@ main {
         flex: none;
         margin: 0;
         padding: 32px 28px;
-        justify-content: center;
+        justify-content: flex-start;
         border-left: 0.5px solid #d4d0ca;
         border-top: none;
         max-height: calc(100svh - 154px);
