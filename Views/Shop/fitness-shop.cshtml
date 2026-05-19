@@ -1,4 +1,4 @@
-﻿@{
+@{
     Layout = null;
 }
 <!DOCTYPE html>
@@ -48,12 +48,25 @@
                 </svg>
                 <input id="searchInput" type="search" placeholder="搜尋高蛋白、肌酸、魚油">
             </label>
-            <a class="user-chip" asp-controller="Shop" asp-action="MyOrders" title="我的訂單" aria-label="我的訂單">
-                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                    <circle cx="9" cy="6" r="3.25" stroke="currentColor" stroke-width="2" />
-                    <path d="M1.5 17c0-4.142 3.358-7.5 7.5-7.5s7.5 3.358 7.5 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-                </svg>
-            </a>
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <a class="user-chip" asp-controller="Account" asp-action="Logout" title="登出" aria-label="登出">
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <circle cx="9" cy="6" r="3.25" stroke="currentColor" stroke-width="2" />
+                        <path d="M1.5 17c0-4.142 3.358-7.5 7.5-7.5s7.5 3.358 7.5 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                    </svg>
+                </a>
+                <a class="order-link" asp-controller="Shop" asp-action="MyOrders">我的訂單</a>
+            }
+            else
+            {
+                <a class="user-chip" asp-controller="Account" asp-action="Index" title="會員登入" aria-label="會員登入">
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <circle cx="9" cy="6" r="3.25" stroke="currentColor" stroke-width="2" />
+                        <path d="M1.5 17c0-4.142 3.358-7.5 7.5-7.5s7.5 3.358 7.5 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                    </svg>
+                </a>
+            }
 
             <button class="cart-chip" id="cartToggle" type="button" aria-expanded="false" aria-controls="cartOverlay">
                 <!-- 購物車icon -->

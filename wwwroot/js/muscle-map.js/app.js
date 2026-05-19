@@ -381,6 +381,107 @@ function refreshOpenDetailExercises() {
 }
 
 
+const DB_MUSCLE_FILTERS = {
+  chest: ['chest'],
+  frontTrapezius: ['back', 'shoulder'],
+  backTrapezius: ['back', 'shoulder'],
+  frontDeltoidLeft: ['shoulder'],
+  frontDeltoidRight: ['shoulder'],
+  rearDelt: ['shoulder'],
+  rhomboid: ['back'],
+  lats: ['back'],
+  bicepsLeft: ['arms'],
+  bicepsRight: ['arms'],
+  triceps: ['arms'],
+  frontForearm: ['arms'],
+  backForearm: ['arms'],
+  abs: ['core'],
+  sideabs: ['core'],
+  quads: ['legs'],
+  shin: ['legs'],
+  hamstring: ['legs'],
+  calves: ['legs'],
+  glute: ['glute', 'legs']
+}
+
+const DB_MUSCLE_SUMMARY_LABELS = {
+  chest: '胸部',
+  shoulder: '肩部',
+  back: '背部',
+  arms: '手臂',
+  core: '核心',
+  legs: '腿部',
+  glute: '臀部'
+}
+
+function getExerciseMuscleKeys(exercise) {
+  return [
+    exercise.muscle,
+    ...(Array.isArray(exercise.muscles) ? exercise.muscles.map(muscle => muscle.key) : [])
+  ].filter(Boolean)
+}
+
+function exerciseMatchesSelectedMuscle(exercise, muscleKey) {
+  const targetKeys = DB_MUSCLE_FILTERS[muscleKey] || [muscleKey]
+  return getExerciseMuscleKeys(exercise).some(key => targetKeys.includes(key))
+}
+
+function renderEquipmentSummary(list, exercises, countEl) {
+  const summary = new Map()
+
+  exercises.forEach(exercise => {
+    const key = getExerciseMuscleKeys(exercise).find(muscleKey => DB_MUSCLE_SUMMARY_LABELS[muscleKey]) || exercise.muscle
+    if (!key) return
+    summary.set(key, (summary.get(key) || 0) + 1)
+  })
+
+  const intro = document.createElement('li')
+  intro.className = 'exercise-summary-intro'
+  intro.textContent = '請點選分類或人體部位以縮小結果'
+  list.appendChild(intro)
+
+  Array.from(summary.entries())
+    .sort((a, b) => b[1] - a[1])
+    .forEach(([key, count]) => {
+      const item = document.createElement('li')
+      const button = document.createElement('button')
+      button.type = 'button'
+      button.className = 'exercise-summary-item'
+      button.innerHTML = `
+        <span>${DB_MUSCLE_SUMMARY_LABELS[key] || key}</span>
+        <strong>${count}</strong>
+      `
+      button.addEventListener('click', () => renderEquipmentSummaryGroup(list, exercises, key, countEl))
+      item.appendChild(button)
+      list.appendChild(item)
+    })
+}
+
+function renderEquipmentSummaryGroup(list, exercises, groupKey, countEl) {
+  const filtered = exercises.filter(exercise => getExerciseMuscleKeys(exercise).includes(groupKey))
+  list.innerHTML = ''
+  if (countEl) countEl.textContent = filtered.length.toString().padStart(2, '0')
+
+  const backItem = document.createElement('li')
+  const backButton = document.createElement('button')
+  backButton.type = 'button'
+  backButton.className = 'exercise-summary-back'
+  backButton.textContent = '返回分類'
+  backButton.addEventListener('click', () => {
+    list.innerHTML = ''
+    if (countEl) countEl.textContent = exercises.length.toString().padStart(2, '0')
+    renderEquipmentSummary(list, exercises, countEl)
+  })
+  backItem.appendChild(backButton)
+  list.appendChild(backItem)
+
+  const header = document.createElement('li')
+  header.className = 'exercise-group-header'
+  header.textContent = DB_MUSCLE_SUMMARY_LABELS[groupKey] || groupKey
+  list.appendChild(header)
+
+  renderExerciseItems(list, filtered, selectedEquipment, true)
+}
 // [主圖動作清單] 根據 selectedMuscle 與 selectedEquipment 渲染右側主清單
 function renderExercises() {
   // 先宣告，再使用
@@ -401,18 +502,25 @@ function renderExercises() {
     }
 
     if (countEl) countEl.textContent = equipmentExercises.length.toString().padStart(2, '0')
-    renderExerciseItems(list, equipmentExercises, selectedEquipment, false)
+    renderEquipmentSummary(list, equipmentExercises, countEl)
     return
   }
 
-  const exercises = (EXERCISES[selectedMuscle] || []).filter(ex => ex.name && ex.name.trim())
+  const dbMuscleExercises = dbExercises
+    .filter(ex => ex.name && ex.name.trim())
+    .filter(ex => exerciseMatchesSelectedMuscle(ex, selectedMuscle))
+  const staticExercises = (EXERCISES[selectedMuscle] || []).filter(ex => ex.name && ex.name.trim())
+  const exercises = dbMuscleExercises.length > 0 ? dbMuscleExercises : staticExercises
+
   if (exercises.length === 0) {
     list.innerHTML = '<li class="exercise-empty">尚未建立動作資料</li>'
+    if (countEl) countEl.textContent = '00'
     return
   }
 
   if (btnSimple.classList.contains('active') && selectedEquipment.length === 0) {
     list.innerHTML = '<li class="exercise-empty">請選擇器材</li>'
+    if (countEl) countEl.textContent = '00'
     return
   }
 

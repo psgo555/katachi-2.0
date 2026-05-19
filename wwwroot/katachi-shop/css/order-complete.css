@@ -107,28 +107,45 @@ body {
 }
 
 .ghost-btn {
-  padding: 8px var(--space-16);
-  border: var(--border-default);
-  border-radius: 2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-8);
+  min-height: 46px;
+  padding: 0 var(--space-20);
+  border-radius: 8px;
+  border: 1px solid var(--color-black);
   background: transparent;
   color: var(--color-black);
   font-family: var(--font-sans);
   font-size: var(--text-sub);
   text-decoration: none;
-  transition: border-color var(--dur-instant);
   white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background var(--dur-instant) var(--ease-out),
+    border-color var(--dur-instant) var(--ease-out),
+    color var(--dur-instant) var(--ease-out),
+    transform var(--dur-instant) var(--ease-out);
 }
 
-.ghost-btn:hover { border-color: var(--color-black); }
+.ghost-btn:hover {
+  background: var(--color-white);
+  transform: translateY(-1px);
+}
 
 .checkout-topbar .ghost-btn {
-  border-color: rgba(255, 255, 255, 0.85);
-  color: var(--color-white);
+  background: var(--color-white);
+  border-color: var(--color-white);
+  color: var(--color-black);
+  font-weight: 700;
 }
 
 .checkout-topbar .ghost-btn:hover {
+  background: var(--color-accent);
   border-color: var(--color-accent);
-  color: var(--color-accent);
+  color: var(--color-black);
+  transform: translateY(-1px);
 }
 
 /* ── Main ── */

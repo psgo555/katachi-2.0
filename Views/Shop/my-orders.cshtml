@@ -1,4 +1,4 @@
-﻿@model List<katachi.Models.Shop.Order>
+@model List<katachi.Models.Shop.Order>
 
 @{
     Layout = null;
@@ -24,6 +24,9 @@
         }
 
         .orders-topbar {
+            position: sticky;
+            top: 0;
+            z-index: var(--z-nav, 1000);
             height: 72px;
             padding: 0 6vw;
             display: flex;
@@ -48,17 +51,34 @@
             align-items: center;
         }
 
-        .nav-btn {
+        .ghost-btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            min-height: 40px;
-            padding: 0 18px;
-            border-radius: 4px;
-            border: 1px solid rgba(255,255,255,.32);
-            color: var(--color-white);
+            gap: var(--space-8);
+            min-height: 46px;
+            padding: 0 var(--space-20);
+            border-radius: 8px;
+            border: 1px solid var(--color-white);
+            background: var(--color-white);
+            color: var(--color-black);
+            font-family: var(--font-sans);
+            font-size: var(--text-sub);
+            font-weight: 700;
             text-decoration: none;
-            font-size: .95rem;
+            white-space: nowrap;
+            transition:
+                background var(--dur-instant) var(--ease-out),
+                border-color var(--dur-instant) var(--ease-out),
+                color var(--dur-instant) var(--ease-out),
+                transform var(--dur-instant) var(--ease-out);
+        }
+
+        .ghost-btn:hover {
+            background: var(--color-accent);
+            border-color: var(--color-accent);
+            color: var(--color-black);
+            transform: translateY(-1px);
         }
 
         .orders-page {
@@ -128,6 +148,16 @@
             font-weight: 700;
         }
 
+        .status-badge.is-cancelled {
+            background: rgba(239, 111, 130, .18);
+            color: #b84b5f;
+        }
+
+        .status-badge.is-completed {
+            background: rgba(64, 154, 100, .18);
+            color: #2f7d4f;
+        }
+
         .order-total {
             text-align: right;
             font-family: "Big Shoulders Display", sans-serif;
@@ -195,8 +225,7 @@
     <header class="orders-topbar">
         <a class="brand" asp-controller="Home" asp-action="Index">KATACHI SHOP</a>
         <div class="orders-actions">
-            <a class="nav-btn" asp-controller="Shop" asp-action="Index">返回商店</a>
-            <a class="nav-btn" asp-controller="Home" asp-action="Index">回首頁</a>
+            <a class="ghost-btn" asp-controller="Shop" asp-action="Index">返回商店</a>
         </div>
     </header>
 
@@ -213,6 +242,13 @@
             <div class="order-list">
                 @foreach (var order in Model)
                 {
+                    var statusClass = order.Status switch
+                    {
+                        "已取消" => "is-cancelled",
+                        "已完成" => "is-completed",
+                        _ => ""
+                    };
+
                     <article class="order-card">
                         <div class="order-card__head">
                             <div>
@@ -223,7 +259,7 @@
                                 <div class="order-meta">成立時間</div>
                                 <div>@order.CreatedAt.ToString("yyyy/MM/dd HH:mm")</div>
                             </div>
-                            <span class="status-badge">@order.Status</span>
+                            <span class="status-badge @statusClass">@order.Status</span>
                             <div class="order-total">NT$ @order.Total.ToString("N0")</div>
                         </div>
 
