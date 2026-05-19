@@ -1,4 +1,4 @@
-﻿@model List<katachi.Models.Shop.Order>
+@model List<katachi.Models.Shop.Order>
 
 @{
     Layout = null;
@@ -182,12 +182,24 @@
             border-bottom: 0;
         }
 
-        .order-item img {
+        .order-item img,
+        .order-item__image-fallback {
             width: 64px;
             height: 64px;
-            object-fit: cover;
             border-radius: 6px;
             background: var(--color-off-white);
+        }
+
+        .order-item img {
+            object-fit: cover;
+        }
+
+        .order-item__image-fallback {
+            display: grid;
+            place-items: center;
+            color: var(--color-grey-mid);
+            font-size: .75rem;
+            font-weight: 700;
         }
 
         .item-name {
@@ -266,8 +278,23 @@
                         <div class="order-items">
                             @foreach (var item in order.Items)
                             {
+                                var optionImageUrl = item.OptionValues
+                                    .Select(v => v.ProductOptionValue?.ImageUrl)
+                                    .FirstOrDefault(url => !string.IsNullOrWhiteSpace(url));
+                                var productImageUrl = item.Product?.Options
+                                    .SelectMany(option => option.Values)
+                                    .Select(value => value.ImageUrl)
+                                    .FirstOrDefault(url => !string.IsNullOrWhiteSpace(url));
+                                var imageUrl = optionImageUrl ?? productImageUrl;
                                 <div class="order-item">
-                                    <img src='@(item.OptionValues.Select(v => v.ProductOptionValue?.ImageUrl).FirstOrDefault(url => !string.IsNullOrWhiteSpace(url)) ?? "/katachi-shop/img/placeholder.png")' alt="@item.ProductName">
+                                    @if (!string.IsNullOrWhiteSpace(imageUrl))
+                                    {
+                                        <img src="@imageUrl" alt="@item.ProductName">
+                                    }
+                                    else
+                                    {
+                                        <div class="order-item__image-fallback" aria-hidden="true">NO IMG</div>
+                                    }
                                     <div>
                                         <div class="item-name">@item.ProductName × @item.Quantity</div>
                                         <div class="item-sub">@item.OptionText</div>

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using katachi.Models.Shop;
@@ -91,7 +91,14 @@ namespace katachi.Controllers
             }
 
             var orders = await _context.Orders
+                .AsSplitQuery()
                 .Include(order => order.Items)
+                    .ThenInclude(item => item.OptionValues)
+                        .ThenInclude(value => value.ProductOptionValue)
+                .Include(order => order.Items)
+                    .ThenInclude(item => item.Product)
+                        .ThenInclude(product => product!.Options)
+                            .ThenInclude(option => option.Values)
                 .Where(order => order.UserId == userId)
                 .OrderByDescending(order => order.CreatedAt)
                 .ToListAsync();
