@@ -71,69 +71,62 @@ btnDetailed.addEventListener('click', () => {
 // 2. 綁定點擊肌肉按鈕
 const musclePairs = document.querySelectorAll('[data-muscle]')
 
+function setLinkedMuscleClass(muscleNames, className, shouldAdd) {
+  muscleNames.forEach(muscleName => {
+    document.querySelectorAll(`[data-muscle="${muscleName}"]`).forEach(el => {
+      el.classList.toggle(className, shouldAdd)
+    })
+  })
+}
+
+function getLinkedMuscleGroup(muscleName, linkMap = MUSCLE_HOVER_LINK) {
+  return [muscleName, ...(linkMap[muscleName] || [])]
+}
+
 musclePairs.forEach(muscle => {
   // 2-1. hover 進入 → 正反面連動亮起
   muscle.addEventListener('mouseenter', () => {
     const muscleName = muscle.dataset.muscle
-    const hoverLinked = MUSCLE_LINK[muscleName] || []
-    hoverLinked.forEach(linkedName => {
-      const linkedEl = document.querySelector(`[data-muscle="${linkedName}"]`)
-      if (linkedEl) linkedEl.classList.add('is-hover-linked')
-    })
+    const hoverLinked = getLinkedMuscleGroup(muscleName, MUSCLE_LINK)
+    setLinkedMuscleClass(hoverLinked, 'is-hover-linked', true)
   })
 
   // 2-2. hover 離開 → 移除正反面連動，但保留點擊連動
   muscle.addEventListener('mouseleave', () => {
     const muscleName = muscle.dataset.muscle
-    const hoverLinked = MUSCLE_LINK[muscleName] || []
-    hoverLinked.forEach(linkedName => {
-      const linkedEl = document.querySelector(`[data-muscle="${linkedName}"]`)
-      if (linkedEl) linkedEl.classList.remove('is-hover-linked')
-    })
+    const hoverLinked = getLinkedMuscleGroup(muscleName, MUSCLE_LINK)
+    setLinkedMuscleClass(hoverLinked, 'is-hover-linked', false)
     // 2-2-1. 恢復點擊連動（如果目前有選中的肌肉）
-    const clickLinked = MUSCLE_HOVER_LINK[selectedMuscle] || []
-    clickLinked.forEach(linkedName => {
-      const linkedEl = document.querySelector(`[data-muscle="${linkedName}"]`)
-      if (linkedEl) linkedEl.classList.add('is-hover-linked')
-    })
+    const clickLinked = selectedMuscle ? getLinkedMuscleGroup(selectedMuscle, MUSCLE_HOVER_LINK) : []
+    setLinkedMuscleClass(clickLinked, 'is-hover-linked', true)
   })
 
   // 2-3. 點擊事件
   muscle.addEventListener('focusin', () => {
     const muscleName = muscle.dataset.muscle
-    const focusLinked = MUSCLE_HOVER_LINK[muscleName] || []
-    focusLinked.forEach(linkedName => {
-      const linkedEl = document.querySelector(`[data-muscle="${linkedName}"]`)
-      if (linkedEl) linkedEl.classList.add('is-hover-linked')
-    })
+    const focusLinked = getLinkedMuscleGroup(muscleName, MUSCLE_HOVER_LINK)
+    setLinkedMuscleClass(focusLinked, 'is-hover-linked', true)
   })
 
   muscle.addEventListener('focusout', () => {
     const muscleName = muscle.dataset.muscle
-    const focusLinked = MUSCLE_HOVER_LINK[muscleName] || []
-    focusLinked.forEach(linkedName => {
-      const linkedEl = document.querySelector(`[data-muscle="${linkedName}"]`)
-      if (linkedEl) linkedEl.classList.remove('is-hover-linked')
-    })
+    const focusLinked = getLinkedMuscleGroup(muscleName, MUSCLE_HOVER_LINK)
+    setLinkedMuscleClass(focusLinked, 'is-hover-linked', false)
   })
 
   muscle.addEventListener('click', (event) => {
     const muscleName = muscle.dataset.muscle
     selectedMuscle = muscleName
 
-    // 2-3-1. 先清除所有肌肉的 is-selected，再幫點擊的肌肉加上
+    // 2-3-1. 先清除所有肌肉的 is-selected，再幫點擊肌肉與連動肌群加上
     musclePairs.forEach(m => m.classList.remove('is-selected'))
-    muscle.classList.add('is-selected')
 
     // 2-3-2. 清除舊的連動高亮
     musclePairs.forEach(m => m.classList.remove('is-hover-linked'))
 
     // 2-3-3. 同側成對肌肉一起顯示 is-selected（橘色）
-    const linked = MUSCLE_HOVER_LINK[muscleName] || []
-    linked.forEach(linkedName => {
-      const linkedEl = document.querySelector(`[data-muscle="${linkedName}"]`)
-      if (linkedEl) linkedEl.classList.add('is-selected')
-    })
+    const linked = getLinkedMuscleGroup(muscleName, MUSCLE_HOVER_LINK)
+    setLinkedMuscleClass(linked, 'is-selected', true)
 
     // 2-3-4. 顯示肌肉名稱並渲染動作列表
     document.querySelector('#muscle-name').textContent = MUSCLE_LABELS[muscleName]
@@ -183,6 +176,9 @@ musclePairs.forEach(muscle => {
             if (externalSvg) {
               externalSvg.classList.add('detail-svg', 'detail-svg--' + detailMuscleName)
               externalSvg.setAttribute('style', detailConfig.svgStyle || '')
+              const isCompactDetail = window.matchMedia && window.matchMedia('(max-width: 760px)').matches
+              const viewBoxOverride = isCompactDetail ? detailConfig.mobileViewBox : detailConfig.viewBox
+              if (viewBoxOverride) externalSvg.setAttribute('viewBox', viewBoxOverride)
               externalSvg.setAttribute('preserveAspectRatio', 'xMidYMid meet')
 
               // 把外框補回外部 svg 最底層
@@ -676,9 +672,6 @@ function resetAll() {
   // 6-5. 關閉彈窗
   detailBackdrop.style.display = 'none'
 }
-
-
-
 
 
 

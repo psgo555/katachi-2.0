@@ -222,11 +222,6 @@ function createOptionGroup(option) {
       if (typeof value === 'object' && value.id) selectedOptionValueIds[option.label] = value.id;
       updatePriceByOption(option, value);
 
-      // 如果選項有圖片（口味、顏色等），就同步把商品圖換成對應圖片。
-      if (typeof value === 'object' && value.image) {
-        detailImage.src = value.image;
-        detailImage.alt = value.text;
-      }
     }
     button.textContent = getOptionText(value);
 
@@ -353,7 +348,7 @@ function buildThumbs() {
   imagedValues.forEach((v, idx) => {
     const btn = document.createElement('button');
     btn.type = 'button';
-    btn.className = 'detail-thumb' + (idx === 0 ? ' is-active' : '');
+    btn.className = 'detail-thumb' + (v.image === product.image ? ' is-active' : '');
     btn.setAttribute('aria-label', v.text);
 
     const img = document.createElement('img');

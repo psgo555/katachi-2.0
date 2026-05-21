@@ -959,17 +959,38 @@ main {
 
 @media (max-width: 760px) {
     .muscle-detail-modal {
-        padding: 24px 18px;
+        width: calc(100vw - 24px);
+        max-width: calc(100vw - 24px);
+        max-height: calc(100svh - 32px);
+        padding: 20px 14px;
+        overflow-x: hidden;
     }
 
+    .muscle-detail-modal[data-muscle-detail] .detail-layout,
     .detail-layout {
-        grid-template-columns: 1fr;
-        gap: 18px;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 14px;
+    }
+
+    .detail-figure {
+        width: 100%;
+        max-height: 42svh;
+        overflow: hidden;
+        align-items: center;
+    }
+
+    .detail-figure svg,
+    .detail-figure img {
+        width: auto !important;
+        max-width: 100% !important;
+        height: auto !important;
+        max-height: 42svh !important;
+        transform: none !important;
     }
 
     .detail-actions {
         padding-left: 0;
-        padding-top: 18px;
+        padding-top: 14px;
         border-left: none;
         border-top: 1px solid #d4d0ca;
     }
@@ -978,6 +999,11 @@ main {
     .detail-svg--bicepsRight,
     .detail-svg--frontDeltoidRight {
         transform: none;
+    }
+
+    .detail-svg--bicepsLeft,
+    .detail-svg--bicepsRight {
+        max-height: 34svh !important;
     }
 }
 

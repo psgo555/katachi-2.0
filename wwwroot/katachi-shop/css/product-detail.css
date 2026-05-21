@@ -818,22 +818,69 @@ body[data-product-id="adjustable-dumbbell"] .product-info-section {
 
 @media (max-width: 640px) {
   .detail-topbar {
-    padding: 16px var(--page-gutter-sm);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    padding: 12px 16px;
+    gap: var(--space-10);
   }
 
   .detail-page {
     padding: var(--space-20) var(--page-gutter-sm) var(--space-40);
   }
 
-  .detail-topbar__actions,
+  .detail-topbar__actions {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(4, auto);
+    justify-content: end;
+    gap: var(--space-8);
+  }
+
   .detail-actions {
     width: 100%;
     flex-direction: column;
   }
 
-  .ghost-btn,
-  .accent-btn {
+  .detail-actions .ghost-btn,
+  .detail-actions .accent-btn {
     width: 100%;
+  }
+
+  .brand {
+    font-size: clamp(1.35rem, 7vw, 1.75rem);
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+  }
+
+  .detail-topbar .ghost-btn,
+  .order-link,
+  .user-chip,
+  .cart-chip {
+    min-height: 40px;
+  }
+
+  .detail-topbar .ghost-btn,
+  .order-link {
+    padding-inline: var(--space-10);
+    font-size: 0.78rem;
+  }
+
+  .user-chip,
+  .cart-chip {
+    width: 40px;
+    padding-inline: var(--space-8);
+  }
+
+  .detail-title {
+    font-size: clamp(3rem, 16vw, 4.2rem);
+  }
+
+  .detail-price strong {
+    font-size: clamp(2.8rem, 13vw, 3.6rem);
+  }
+
+  .detail-visual {
+    aspect-ratio: 1 / 1;
   }
 
   .product-info-head {
@@ -843,6 +890,36 @@ body[data-product-id="adjustable-dumbbell"] .product-info-section {
 
   .detail-highlights {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 420px) {
+  .detail-topbar {
+    padding-inline: 12px;
+  }
+
+  .detail-topbar__actions {
+    grid-template-columns: repeat(3, auto);
+  }
+
+  .detail-topbar .ghost-btn {
+    grid-column: 1 / -1;
+    justify-self: stretch;
+  }
+
+  .detail-options,
+  .option-group__values {
+    gap: var(--space-8);
+  }
+
+  .option-value {
+    min-height: 38px;
+    padding-inline: var(--space-14);
+  }
+
+  .summary-card {
+    width: min(100vw, 420px);
+    padding: var(--space-24) var(--space-20);
   }
 }
 

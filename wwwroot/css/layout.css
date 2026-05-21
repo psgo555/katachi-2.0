@@ -57,6 +57,7 @@
 
         #nav.muscle-map-fixed .nav-logo,
         #nav.muscle-map-fixed .nav-user,
+        #nav.muscle-map-fixed .nav-username,
         #nav.muscle-map-fixed .menu-btn-text {
             color: #ffffff;
         }
@@ -105,6 +106,15 @@
     display: flex;
     align-items: center;
     gap: var(--space-24);
+    min-width: 0;
+}
+
+.nav-username {
+    color: var(--color-bg);
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+    line-height: 1;
+    white-space: nowrap;
 }
 
 .nav-user {
@@ -578,8 +588,12 @@ footer {
 
 @media (max-width: 768px) {
     #nav {
-        padding: 0 var(--page-gutter-sm);
-        height: 48px;
+        padding: 0 18px;
+        height: 64px;
+    }
+
+    #nav.muscle-map-fixed {
+        padding: 12px 18px;
     }
 
     .nav-links {
@@ -594,5 +608,135 @@ footer {
 
     .nav-logo {
         font-size: 1.2rem;
+        letter-spacing: 4px;
+        flex: 0 0 auto;
+    }
+
+    .nav-right {
+        gap: 14px;
+        justify-content: flex-end;
+    }
+
+    .nav-username {
+        max-width: 4.5rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-size: 0.68rem;
+        letter-spacing: 1px;
+    }
+
+    .nav-user svg {
+        width: 17px;
+        height: 17px;
+    }
+
+    #menu-btn {
+        gap: 9px;
+    }
+
+    .menu-btn-text {
+        font-size: 1.25rem;
+        letter-spacing: 2px;
+    }
+
+    .menu-lines {
+        width: 18px;
+        height: 14px;
+    }
+
+    .menu-line {
+        width: 18px;
+        height: 3px;
+    }
+
+    footer {
+        padding: 48px 24px 32px;
+        overflow: hidden;
+    }
+
+    .footer-top {
+        grid-template-columns: 1fr;
+        gap: 32px;
+        padding-bottom: 40px;
+        margin-bottom: 28px;
+    }
+
+    .footer-top > * {
+        min-width: 0;
+    }
+
+    .footer-logo {
+        font-size: 1.65rem;
+        letter-spacing: 5px;
+    }
+
+    .footer-tagline {
+        max-width: 100%;
+        margin-bottom: 24px;
+    }
+
+    .footer-col-title {
+        margin-bottom: 14px;
+    }
+
+    .footer-links {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px 18px;
+    }
+
+    .footer-links a {
+        display: block;
+        line-height: 1.65;
+        word-break: keep-all;
+        overflow-wrap: normal;
+    }
+
+    .footer-bottom {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .footer-scroll-top {
+        padding: 0;
+    }
+}
+
+@media (max-width: 420px) {
+    #nav {
+        padding-inline: 16px;
+    }
+
+    .nav-logo {
+        font-size: 1.05rem;
+        letter-spacing: 3px;
+    }
+
+    .nav-right {
+        gap: 10px;
+    }
+
+    .menu-btn-text {
+        font-size: 1.15rem;
+        letter-spacing: 1px;
+    }
+
+    footer {
+        padding: 44px 22px 30px;
+    }
+
+    .footer-top {
+        gap: 28px;
+    }
+
+    .footer-links {
+        grid-template-columns: 1fr 1fr;
+        column-gap: 16px;
+    }
+
+    .footer-copy,
+    .footer-jp {
+        line-height: 1.7;
     }
 }

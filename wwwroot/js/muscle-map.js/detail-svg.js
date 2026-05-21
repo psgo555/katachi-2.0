@@ -312,10 +312,12 @@ const DETAIL_SVG_CONFIGS = {
   // 肱二頭肌
   bicepsLeft: {
     svgStyle: 'height:min(72vh,620px);width:auto;max-width:100%;display:block;margin:0 auto;overflow:visible',
+    mobileViewBox: '0 0 938 1035',
     svgSrc: '/svg/detail/bicepsLeft.svg'
   },
   bicepsRight: {
     svgStyle: 'height:min(72vh,620px);width:auto;max-width:100%;display:block;margin:0 auto;overflow:visible',
+    mobileViewBox: '0 0 938 1035',
     svgSrc: '/svg/detail/bicepsRight.svg'
   },
 
@@ -570,7 +572,6 @@ function renderDetailSubExercises(container, muscleName, regionKey, regionLabel,
   wrapper.appendChild(ul)
   container.appendChild(wrapper)
 }
-
 
 
 
